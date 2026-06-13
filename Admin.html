@@ -11,7 +11,8 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script type="text/javascript">
    (function(){
-      emailjs.init("k2uQOrg3RblRDxu50"); // Aapki Public Key
+      // 👇 Aapki Asli Public Key 👇
+      emailjs.init("k2uQOrg3RbIRDxu50"); 
    })();
 </script>
 
@@ -823,7 +824,6 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    // ADDED signInAnonymously TO BYPASS FIREBASE AUTH RULE FOR RESELLERS
     import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, set, get, push, remove, update, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -843,6 +843,7 @@
             name: "Riyaz Official Store",
             message: message
         };
+        // 👇 Aapki Asli Service ID aur Template ID 👇
         emailjs.send("service_jyzfz3b", "template_84pyjax", templateParams)
             .then(function(res) { console.log('Email Sent Success: ', res.status); })
             .catch(function(err) { console.error('Email Sent Failed: ', err); });
@@ -971,7 +972,7 @@
                     return showToast("Your account validity has EXPIRED! Contact Master Admin.", "error");
                 }
                 
-                // 🔥 BUG FIX: SIGN IN ANONYMOUSLY TO BYPASS FIREBASE DB SECURITY RULES FOR RESELLER 🔥
+                // 🔥 BYPASS FOR RESELLERS 🔥
                 try {
                     await signInAnonymously(auth);
                 } catch(anonErr) {
