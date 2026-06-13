@@ -898,10 +898,8 @@
         const resellerEmail = localStorage.getItem('reseller_logged_in_email');
         const resellerId = localStorage.getItem('reseller_logged_in_id');
 
-        let currentUrlPath = window.location.href.split('?')[0];
-        let pathParts = currentUrlPath.split('/');
-        pathParts[pathParts.length - 1] = 'index.html'; 
-        const domainURL = pathParts.join('/');
+        // 🔥 URL FIX APPLIED HERE 🔥
+        const domainURL = 'https://work81259-maker.github.io/protected-project/';
 
         if (firebaseUser && adminEmails.includes(firebaseUser.email)) {
             currentAdmin = firebaseUser; 
@@ -2318,10 +2316,8 @@
             tbody.innerHTML = '';
             if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No resellers found</td></tr>'; return; }
             
-            let currentUrlPath = window.location.href.split('?')[0];
-            let pathParts = currentUrlPath.split('/');
-            pathParts[pathParts.length - 1] = 'index.html'; 
-            const domainURL = pathParts.join('/');
+            // 🔥 URL FIX APPLIED HERE 🔥
+            const domainURL = 'https://work81259-maker.github.io/protected-project/';
             
             Object.entries(snap.val()).forEach(([id, r]) => {
                 const row = document.createElement('tr');
