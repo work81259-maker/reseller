@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>RIYAZ STORE OFFICIAL ADMIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- EmailJS SDK added here -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init("k2uQOrg3RblRDxu50"); // Aapki Public Key
+   })();
+</script>
+
+<style>
+        :root {
+            --bg-color: #050508;
+            --card-bg: rgba(15, 18, 25, 0.6);
+            --card-border: rgba(0, 240, 255, 0.15);
+            --neon-cyan: #00f0ff;
+            --neon-cyan-dim: rgba(0, 240, 255, 0.4);
+            --neon-purple: #bc13fe;
+            --text-main: #ffffff;
+            --text-muted: #a0a5b5;
+            --error: #ff2a5f;
+            --success: #00ff66;
+            --warning: #ffb800;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body { background: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 40%, rgba(188,19,254,0.08), transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(0,240,255,0.08), transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: bgPulse 8s ease-in-out infinite;
+        }
+        @keyframes bgPulse { 0%,100%{opacity:0.5;}50%{opacity:1;} }
+
+        .hidden { display: none !important; }
+        
+        .glass { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border); border-radius: 16px; transition: all 0.3s ease; }
+        .glass:hover { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan-dim); }
+
+        .btn {
+            background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+            padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;
+            font-size: 13px; position: relative; overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(0,240,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        .btn:hover::before { width: 200px; height: 200px; }
+        .btn:hover { background: rgba(0,240,255,0.1); box-shadow: 0 0 15px var(--neon-cyan-dim); transform: translateY(-2px); }
+        .btn-primary { background: var(--neon-cyan); color: #000; font-weight: 800; }
+        .btn-primary:hover { background: #fff; border-color: #fff; box-shadow: 0 0 20px var(--neon-cyan); }
+        .btn-success { background: var(--success); border-color: var(--success); color: #000; }
+        .btn-warning { background: var(--warning); border-color: var(--warning); color: #000; }
+        .btn-danger { background: var(--error); border-color: var(--error); color: #fff; }
+        .btn-sm { padding: 6px 12px; font-size: 11px; }
+        .btn-back { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: white; margin-bottom: 20px; }
+        .btn-back:hover { background: rgba(255,255,255,0.1); border-color: white; transform: translateX(-5px); }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-muted); }
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white;
+            outline: none; font-size: 14px; transition: all 0.3s;
+        }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan-dim);
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,8,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(0,240,255,0.1); border-top-color: var(--neon-cyan); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 400px; }
+        .toast { padding: 12px 18px; border-radius: 10px; color: white; font-weight: 600; font-size: 13px; background: var(--card-bg); backdrop-filter: blur(10px); border-left: 4px solid var(--neon-cyan); animation: slideUp 0.3s forwards; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        #auth-screen { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .auth-card { width: 100%; max-width: 420px; padding: 40px 30px; text-align: center; border-top: 2px solid var(--neon-cyan); animation: fadeInScale 0.5s ease; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        #admin-app { display: none; width: 100%; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; z-index: 1000; background: rgba(10,12,18,0.95); backdrop-filter: blur(15px); border-bottom: 2px solid transparent; border-image: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); border-image-slice: 1; }
+        .logo { font-weight: 800; font-size: 22px; }
+        .logo span { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan-dim); }
+        .logo small { font-size: 10px; color: var(--warning); margin-left: 5px; }
+        .admin-badge { background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan)); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .logout-btn { background: rgba(255,42,95,0.2); border: 1px solid var(--error); color: var(--error); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.3s; }
+        .logout-btn:hover { background: var(--error); color: white; box-shadow: 0 0 15px var(--error); }
+
+        .sidebar { position: fixed; top: 65px; left: 0; width: 260px; height: calc(100% - 65px); background: rgba(10,12,18,0.95); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px 0; overflow-y: auto; z-index: 99; }
+        .sidebar-item { padding: 14px 25px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; color: var(--text-muted); border-left: 3px solid transparent; position: relative; }
+        .sidebar-item::before { content: '▶'; position: absolute; left: -20px; opacity: 0; transition: all 0.3s; font-size: 10px; color: var(--neon-cyan); }
+        .sidebar-item:hover::before { left: 10px; opacity: 1; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(0,240,255,0.08); color: var(--neon-cyan); border-left-color: var(--neon-cyan); padding-left: 28px; }
+        .sidebar-item i { width: 24px; font-size: 18px; }
+
+        .main-content { margin-left: 260px; padding: 85px 25px 40px; min-height: 100vh; }
+        .page-title { font-size: 26px; font-weight: 800; margin-bottom: 25px; }
+        .page-title span { color: var(--neon-purple); text-shadow: 0 0 10px var(--neon-purple); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { padding: 20px; text-align: center; position: relative; overflow: hidden; transition: all 0.3s; }
+        .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); transform: scaleX(0); transition: transform 0.3s; }
+        .stat-card:hover::after { transform: scaleX(1); }
+        
+        .clickable-card { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+        .clickable-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,240,255,0.15); border-color: rgba(255,255,255,0.2); }
+        .card-action { margin-top: 15px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; opacity: 0.8; transition: 0.3s; }
+        .clickable-card:hover .card-action { opacity: 1; gap: 10px; }
+
+        .stat-card h3 { font-size: 36px; font-weight: 800; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan-dim); }
+        .stat-card p { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
+
+        .card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: all 0.3s; }
+        .card:hover { border-color: var(--neon-cyan-dim); box-shadow: 0 5px 20px rgba(0,240,255,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; gap: 10px; }
+        .card-header h3 { font-size: 18px; font-weight: 700; }
+
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 12px 15px; text-align: left; font-size: 13px; }
+        th { color: var(--neon-cyan); font-weight: 600; border-bottom: 2px solid var(--neon-cyan-dim); }
+        tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
+        tr:hover { background: rgba(0,240,255,0.05); transform: scale(1.01); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.2s; }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal { background: rgba(20,24,34,0.98); border: 1px solid var(--neon-cyan); width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; border-radius: 20px; animation: modalPop 0.3s ease; }
+        @keyframes modalPop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .close-modal { background: none; border: none; color: white; font-size: 24px; cursor: pointer; transition: all 0.3s; }
+        .close-modal:hover { color: var(--error); transform: rotate(90deg); }
+
+        .plan-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+        
+        .action-btns { display: flex; gap: 5px; }
+        .btn-icon-only { padding: 6px 10px; font-size: 14px; border-radius: 6px; }
+
+        @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar-item span { display: none; } .sidebar-item i { width: auto; font-size: 20px; } .main-content { margin-left: 70px; } }
+        @media (max-width: 480px) { .main-content { padding: 75px 15px 30px; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card h3 { font-size: 28px; } .navbar { padding: 0 15px; } .logo { font-size: 16px; } }
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div><p style="margin-top:20px;color:var(--neon-cyan);">LOADING ADMIN PANEL...</p></div>
+<div id="toast-container"></div>
+
+<div id="auth-screen">
+    <div class="auth-card glass">
+        <div style="margin-bottom:20px;"><i class="fas fa-shield-alt" style="font-size:60px;color:var(--neon-cyan);text-shadow:0 0 20px var(--neon-cyan-dim);"></i></div>
+        <h1>MASTER <span style="color:var(--neon-cyan);">ADMIN</span></h1>
+        <p style="margin-bottom:20px;color:var(--text-muted);">Secure Administrator Access</p>
+        <div class="input-group"><input id="admin-email" placeholder="Admin/Reseller Email" type="email"></div>
+        <div class="input-group"><input id="admin-pass" placeholder="Password" type="password"></div>
+        <button class="btn btn-primary" id="admin-login-btn"><i class="fas fa-sign-in-alt"></i> Login to Dashboard</button>
+    </div>
+</div>
+
+<div id="admin-app">
+    <nav class="navbar">
+        <div class="logo"><span>STORE</span> ADMIN <small>PANEL</small></div>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <span class="admin-badge" id="admin-email-display">admin@example.com</span>
+            <button class="logout-btn" id="admin-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <div class="sidebar-item active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span> Dashboard</span></div>
+        <div class="sidebar-item" data-page="panels"><i class="fas fa-box"></i><span> Panel Management</span></div>
+        <div class="sidebar-item" data-page="promotions"><i class="fas fa-sliders-h"></i><span> Promotions</span></div>
+        <div class="sidebar-item" data-page="coupons"><i class="fas fa-ticket-alt"></i><span> Coupons</span></div>
+        
+        <div class="sidebar-item" data-page="keys-dashboard"><i class="fas fa-key"></i><span> Keys Manager</span></div>
+        <div class="sidebar-item" data-page="payments-dashboard"><i class="fas fa-wallet"></i><span> Payments Manager</span></div>
+        
+        <div class="sidebar-item" data-page="settings"><i class="fas fa-cog"></i><span> Settings</span></div>
+        <div class="sidebar-item" data-page="users"><i class="fas fa-users"></i><span> Users</span></div>
+        
+        <!-- BANNED USERS MENU ITEM -->
+        <div class="sidebar-item" data-page="banned-users"><i class="fas fa-user-slash" style="color: var(--error);"></i><span style="color: var(--error);"> Banned Users</span></div>
+        
+        <div class="sidebar-item" data-page="resellers" id="menu-resellers"><i class="fas fa-user-tie"></i><span> Resellers</span></div>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard -->
+        <div id="dashboard-page">
+            <h2 class="page-title">Admin <span>Dashboard</span></h2>
+            
+            <!-- STORE LINK BOX FOR RESELLERS/MASTERS -->
+            <div id="reseller-link-box" class="card" style="border-color:var(--success); box-shadow: 0 0 15px rgba(0,255,102,0.1);">
+                <h4 style="color:var(--success); margin-bottom:10px;"><i class="fas fa-link"></i> Aapka Unique Store Link (Share with users)</h4>
+                <div style="display:flex; gap:10px;">
+                    <input id="my-store-link" readonly style="flex:1; background:rgba(0,0,0,0.5); border:1px dashed var(--success); color:white; padding:10px; border-radius:8px; font-size:13px; outline:none;">
+                    <button class="btn btn-success" onclick="copyStoreLink()"><i class="fas fa-copy"></i> COPY</button>
+                </div>
+                <p style="font-size: 11px; color:var(--text-muted); margin-top: 5px;">*Is link se jo bhi join karega wo sirf aapke panels aur apka payment detail dekhega.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--neon-cyan);" onclick="navigateAdmin('users')">
+                    <h3 id="total-users">0</h3><p><i class="fas fa-users"></i> Total Users</p>
+                    <div class="card-action" style="color:var(--neon-cyan);">View All Users <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--neon-purple);" onclick="navigateAdmin('panels')">
+                    <h3 id="total-panels">0</h3><p><i class="fas fa-box"></i> Active Panels</p>
+                    <div class="card-action" style="color:var(--neon-purple);">Manage Panels <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--warning);" onclick="navigateAdmin('pending-keys')">
+                    <h3 id="pending-keys-dash">0</h3><p><i class="fas fa-key"></i> Pending Keys</p>
+                    <div class="card-action" style="color:var(--warning);">View Requests <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--success);" onclick="navigateAdmin('pending-payments')">
+                    <h3 id="pending-payments-dash">0</h3><p><i class="fas fa-clock"></i> Pending Payments</p>
+                    <div class="card-action" style="color:var(--success);">View Approvals <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panels Page -->
+        <div id="panels-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('dashboard')"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            <h2 class="page-title">Panel <span>Management</span></h2>
+            <div class="card">
+                <div class="card-header"><h3>Panel Management</h3><button class="btn btn-primary" id="add-panel-btn"><i class="fas fa-plus"></i> Add Panel</button></div>
+                <div class="table-responsive"><table id="panels-table"><thead><th>Name</th><th>Category</th><th>Status</th><th>Plans</th><th>Added By</th><th>Actions</th></thead><tbody id="panels-list"></tbody></table></div>
+            </div>
+        </div>
+
+        <!-- Promotions Page -->
+        <div id="promotions-page" class="hidden">
+            <h2 class="page-title">Promotions <span>& Offers</span></h2>
+            <div class="card">
+                <div class="card-header"><h3>Promotions</h3><button class="btn btn-primary" id="add-promo-btn"><i class="fas fa-plus"></i> Add Promotion</button></div>
+                <div class="table-responsive"><table><thead><th>Title</th><th>Image</th><th>Status</th><th>Actions</th></thead><tbody id="promotions-list"></tbody></table></div>
+            </div>
+        </div>
+
+        <!-- Coupons Page -->
+        <div id="coupons-page" class="hidden">
+            <h2 class="page-title">Discount <span>Coupons</span></h2>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Coupon Management</h3>
+                    <button class="btn btn-primary" id="add-coupon-btn"><i class="fas fa-plus"></i> Create Coupon</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <th>Coupon Code</th>
+                            <th>Discount (₹)</th>
+                            <th>Usage Limit</th>
+                            <th>Used Count</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </thead>
+                        <tbody id="coupons-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keys Dashboard -->
+        <div id="keys-dashboard-page" class="hidden">
+            <h2 class="page-title">Keys <span>Manager</span></h2>
+            
+            <!-- KEY INVENTORY / STOCK SYSTEM -->
+            <div class="card" style="border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(188,19,254,0.1);">
+                <div class="card-header">
+                    <h3><i class="fas fa-boxes"></i> Key Inventory (Stock)</h3>
+                    <button class="btn btn-primary" onclick="openStockModal()" style="background: linear-gradient(90deg, #bc13fe, #00f0ff); border: none; color: black;"><i class="fas fa-plus-circle"></i> Add Keys to Stock</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><th>Panel Name</th><th>Duration Plan</th><th>Keys Available in Stock</th><th>Actions</th></thead>
+                        <tbody id="stock-list">
+                            <!-- Stock count will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card glass" style="border-bottom: 3px solid var(--neon-cyan);">
+                    <h3 id="km-total">0</h3><p>Total Requests</p>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--warning);" onclick="navigateAdmin('pending-keys')">
+                    <h3 id="km-pending">0</h3><p>Pending Requests</p>
+                    <div class="card-action" style="color:var(--warning);">View Pending List <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--success);" onclick="navigateAdmin('delivered-keys')">
+                    <h3 id="km-delivered">0</h3><p>Delivered Keys</p>
+                    <div class="card-action" style="color:var(--success);">View Delivered List <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Keys -->
+        <div id="pending-keys-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('keys-dashboard')"><i class="fas fa-arrow-left"></i> Back to Keys Manager</button>
+            <h2 class="page-title" style="color:var(--warning);">Pending <span>Keys</span></h2>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-clock"></i> Only Pending Key Requests</h3></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><th>User</th><th>Panel</th><th>Plan</th><th>Amount</th><th>Purchase Date</th><th>Action</th></thead>
+                        <tbody id="pending-keys-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivered Keys -->
+        <div id="delivered-keys-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('keys-dashboard')"><i class="fas fa-arrow-left"></i> Back to Keys Manager</button>
+            <h2 class="page-title" style="color:var(--success);">Delivered <span>Keys</span></h2>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-check-double"></i> Delivered Key History</h3></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><th>User</th><th>Panel</th><th>Plan</th><th>Amount</th><th>Purchase Date</th><th>License Key</th></thead>
+                        <tbody id="delivered-keys-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Dashboard -->
+        <div id="payments-dashboard-page" class="hidden">
+            <h2 class="page-title">Payments <span>Manager</span></h2>
+            <div class="stats-grid">
+                <div class="stat-card glass" style="border-bottom: 3px solid var(--neon-purple);">
+                    <h3 id="pm-total">0</h3><p>Total Payments</p>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--warning);" onclick="navigateAdmin('pending-payments')">
+                    <h3 id="pm-pending">0</h3><p>Pending Approvals</p>
+                    <div class="card-action" style="color:var(--warning);">View Pending List <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--success);" onclick="navigateAdmin('approved-payments')">
+                    <h3 id="pm-approved">0</h3><p>Approved</p>
+                    <div class="card-action" style="color:var(--success);">View Approved List <i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="stat-card glass clickable-card" style="border-bottom: 3px solid var(--error);" onclick="navigateAdmin('rejected-payments')">
+                    <h3 id="pm-rejected" style="color:var(--error);">0</h3><p>Rejected</p>
+                    <div class="card-action" style="color:var(--error);">View Rejected List <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Payments -->
+        <div id="pending-payments-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('payments-dashboard')"><i class="fas fa-arrow-left"></i> Back to Payments Manager</button>
+            <h2 class="page-title" style="color:var(--warning);">Pending <span>Payments</span></h2>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-clock"></i> Needs Approval</h3></div>
+                <div class="table-responsive">
+                    <table><thead><th>User</th><th>Amount</th><th>UTR</th><th>Phone</th><th>Actions</th></thead><tbody id="pending-payments-list"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Payments -->
+        <div id="approved-payments-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('payments-dashboard')"><i class="fas fa-arrow-left"></i> Back to Payments Manager</button>
+            <h2 class="page-title" style="color:var(--success);">Approved <span>Payments</span></h2>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-check-circle"></i> Successfully Approved Payments</h3></div>
+                <div class="table-responsive">
+                    <table><thead><th>User</th><th>Amount</th><th>UTR</th><th>Phone</th><th>Status</th></thead><tbody id="approved-payments-list"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Payments -->
+        <div id="rejected-payments-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('payments-dashboard')"><i class="fas fa-arrow-left"></i> Back to Payments Manager</button>
+            <h2 class="page-title" style="color:var(--error);">Rejected <span>Payments</span></h2>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-times-circle"></i> Rejected Payments</h3></div>
+                <div class="table-responsive">
+                    <table><thead><th>User</th><th>Amount</th><th>UTR</th><th>Phone</th><th>Status</th></thead><tbody id="rejected-payments-list"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings-page" class="hidden">
+            <h2 class="page-title">App <span>Settings</span></h2>
+            <div class="card" style="border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(188,19,254,0.1);">
+                <div class="card-header"><h3>🚀 App Controls (Special Features)</h3></div>
+                
+                <h4 style="color:var(--neon-cyan); margin-bottom: 10px; font-size: 15px;"><i class="fas fa-tools"></i> 1. Maintenance Mode</h4>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select id="setting-maint-status"><option value="false">Off (App is Normal)</option><option value="true">On (App is Locked)</option></select>
+                </div>
+                <div class="input-group">
+                    <label>Maintenance Message</label>
+                    <input id="setting-maint-msg" placeholder="We are upgrading our servers. Please wait...">
+                </div>
+                <div class="input-group">
+                    <label>Maintenance Image URL</label>
+                    <input id="setting-maint-img" placeholder="https://...">
+                </div>
+                <div class="input-group">
+                    <label>Maintenance Redirect Link (Join Button)</label>
+                    <input id="setting-maint-link" placeholder="https://t.me/...">
+                </div>
+                
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
+                
+                <h4 style="color:var(--neon-cyan); margin-bottom: 10px; font-size: 15px;"><i class="fas fa-bullhorn"></i> 2. Announcement Ticker (Top Banner)</h4>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select id="setting-ticker-status"><option value="false">Hide</option><option value="true">Show</option></select>
+                </div>
+                <div class="input-group">
+                    <label>Ticker Message</label>
+                    <input id="setting-ticker-msg" placeholder="Mega Sale! 50% Off Today!">
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
+                
+                <h4 style="color:var(--neon-cyan); margin-bottom: 10px; font-size: 15px;"><i class="fas fa-window-restore"></i> 3. Welcome Popup Modal</h4>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select id="setting-popup-status"><option value="false">Hide</option><option value="true">Show on App Start</option></select>
+                </div>
+                <div class="input-group">
+                    <label>Offer Image URL</label>
+                    <input id="setting-popup-img" placeholder="https://...">
+                </div>
+                <div class="input-group">
+                    <label>Redirect Link (Join Button)</label>
+                    <input id="setting-popup-link" placeholder="https://t.me/...">
+                </div>
+                 <div class="input-group">
+                    <label>Popup Text Message</label>
+                    <textarea id="setting-popup-text" rows="3" placeholder="Popup ke niche dikhane wala text yahan likhein..."></textarea>
+                </div>
+                
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
+                
+                <h4 style="color:var(--error); margin-bottom: 10px; font-size: 15px;"><i class="fas fa-ban"></i> 4. Banned Screen Settings</h4>
+                <div class="input-group">
+                    <label>Banned Screen Image URL (Full Size Photo)</label>
+                    <input id="setting-banned-img" placeholder="https://... (Leave empty for default icon)">
+                </div>
+                <div class="input-group">
+                    <label>Contact Admin Link (For Banned Users)</label>
+                    <input id="setting-banned-link" placeholder="https://t.me/... or https://wa.me/...">
+                </div>
+
+                <button class="btn btn-primary" id="save-app-controls" style="margin-top: 15px; width: 100%;">Save App Controls</button>
+            </div>
+
+            <div class="card"><div class="card-header"><h3>Payment Settings</h3></div><div class="input-group"><label>UPI ID</label><input id="setting-upi" placeholder="Enter UPI ID"></div><div class="input-group"><label>QR Image URL</label><input id="setting-qr" placeholder="https://..."></div><button class="btn btn-primary" id="save-payment-settings">Save</button></div>
+            
+            <div class="card">
+                <div class="card-header"><h3>Support Links</h3></div>
+                <div class="input-group"><label>WhatsApp</label><input id="setting-wa" placeholder="https://wa.me/..."></div>
+                <div class="input-group"><label>Telegram (Login)</label><input id="setting-tg-login" placeholder="https://t.me/..."></div>
+                <div class="input-group"><label>Telegram (Dashboard)</label><input id="setting-tg-dash" placeholder="https://t.me/..."></div>
+                <div class="input-group"><label>Customer Support Link (Menu Dropdown)</label><input id="setting-customer-support" placeholder="https://t.me/... or https://wa.me/..."></div>
+                <div class="input-group"><label>Floating Telegram Button (Bottom Right)</label><input id="setting-tg-floating" placeholder="https://t.me/..."></div>
+                <button class="btn btn-primary" id="save-support-links">Save</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>Design Settings (User Panel)</h3></div>
+                
+                <div class="input-group">
+                    <label>Login Page Image URL (Top image in Login box)</label>
+                    <input id="setting-login-image" placeholder="https://... (Leave empty to hide photo)">
+                </div>
+
+                <div class="input-group">
+                    <label>Login/Signup Box Background URL (Leave empty for default dark)</label>
+                    <input id="setting-auth-box-bg" placeholder="https://...">
+                </div>
+
+                <div class="input-group">
+                    <label>Login/Signup Main Title (Heading)</label>
+                    <input id="setting-auth-heading" placeholder="e.g., FFH4X TEAM STORE">
+                </div>
+
+                <div class="input-group">
+                    <label>Login/Signup Sub-Title (Sub-heading)</label>
+                    <input id="setting-auth-subheading" placeholder="e.g., Welcome back! Login to continue.">
+                </div>
+
+                <div class="input-group">
+                    <label>App Background Image URL (Main Wallpaper)</label>
+                    <input id="setting-bg-image" placeholder="https://... (Leave empty for default black theme)">
+                </div>
+                <button class="btn btn-primary" id="save-design-settings">Save Design Settings</button>
+            </div>
+        </div>
+
+        <!-- Users Page (Active Users Only) -->
+        <div id="users-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('dashboard')"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            <h2 class="page-title">Active <span>Users</span></h2>
+            <div class="card">
+                <div class="card-header" style="flex-direction: column; align-items: stretch; gap: 10px; border-bottom: none; padding-bottom: 0;">
+                    <h3 style="margin-bottom: 10px;"><i class="fas fa-users"></i> Registered Active Users <span id="user-count-badge" style="font-size:12px; background:var(--neon-cyan); color:#000; padding:3px 8px; border-radius:10px; margin-left:10px;">Loading...</span></h3>
+                    
+                    <div class="input-group" style="margin-bottom: 10px; width: 100%;">
+                        <input type="text" id="search-user-input" placeholder="🔍 Instant Search by Gmail ID..." style="padding: 14px 18px; font-size: 15px; border-color: var(--neon-cyan); background: rgba(0,240,255,0.05); color: var(--neon-cyan);">
+                    </div>
+                    
+                    <!-- VIP QUICK BALANCE BOX (WITH AUTO HISTORY) -->
+                    <div id="quick-balance-view" style="display: none; background: linear-gradient(135deg, rgba(15,18,25,0.9), rgba(0,240,255,0.1)); border: 1px solid var(--neon-cyan); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,240,255,0.15);">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+                
+                <div class="table-responsive" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                    <table>
+                        <thead>
+                            <th style="min-width: 220px;">Email ID</th>
+                            <th>Balance</th>
+                            <th>Purchases</th>
+                            <th style="min-width: 100px;">Joined</th>
+                            <th style="min-width: 160px;">Actions</th>
+                        </thead>
+                        <tbody id="users-list">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banned Users Page -->
+        <div id="banned-users-page" class="hidden">
+            <button class="btn btn-back" onclick="navigateAdmin('dashboard')"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            <h2 class="page-title" style="color: var(--error);">Banned <span>Users</span></h2>
+            <div class="card" style="border-color: rgba(255,42,95,0.3);">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-slash" style="color: var(--error);"></i> Suspended / Blocked Accounts <span id="banned-count-badge" style="font-size:12px; background:var(--error); padding:3px 8px; border-radius:10px; margin-left:10px;">0</span></h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <th style="min-width: 220px;">Email ID</th>
+                            <th>Balance</th>
+                            <th style="min-width: 100px;">Joined</th>
+                            <th style="min-width: 100px;">Actions</th>
+                        </thead>
+                        <tbody id="banned-users-list">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resellers Page -->
+        <div id="resellers-page" class="hidden">
+            <h2 class="page-title">Reseller <span>Panel</span></h2>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Reseller Management</h3>
+                    <button class="btn btn-primary" id="add-reseller-btn"><i class="fas fa-plus"></i> Add Reseller</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <th>Email / ID</th>
+                            <th>Password</th>
+                            <th>Status</th>
+                            <th>Validity</th>
+                            <th>Store Link</th>
+                            <th>Actions</th>
+                        </thead>
+                        <tbody id="resellers-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+
+<!-- ADD STOCK MODAL -->
+<div class="modal-overlay" id="stock-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="stock-modal-title">Add Keys to Stock</h3>
+            <button class="close-modal" onclick="closeModal('stock-modal')">×</button>
+        </div>
+        
+        <div class="input-group">
+            <label>Select Panel (Ye key kis panel ke liye hai?)</label>
+            <select id="stock-panel-select">
+                <option value="" disabled selected>Loading panels...</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Select Plan Duration</label>
+            <select id="stock-duration">
+                <option value="1_hour">1 Hour Plan</option>
+                <option value="1_day">1 Day Plan</option>
+                <option value="3_days">3 Days Plan</option>
+                <option value="5_days">5 Days Plan</option>
+                <option value="7_days">7 Days Plan</option>
+                <option value="10_days">10 Days Plan</option>
+                <option value="15_days">15 Days Plan</option>
+                <option value="30_days">30 Days (1 Month) Plan</option>
+                <option value="lifetime">Lifetime Plan</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Enter License Keys (Ek line mein ek key dalein)</label>
+            <textarea id="stock-keys-input" rows="6" placeholder="KEY-ABCDE-12345&#10;KEY-FGHIJ-67890&#10;KEY-KLMNO-11223"></textarea>
+        </div>
+        <button class="btn btn-success" id="save-stock-btn" style="width: 100%; margin-top: 10px;"><i class="fas fa-save"></i> Save to Stock</button>
+    </div>
+</div>
+
+<!-- VIEW STOCK KEYS MODAL -->
+<div class="modal-overlay" id="view-stock-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="view-stock-title">Keys List</h3>
+            <button class="close-modal" onclick="closeModal('view-stock-modal')">×</button>
+        </div>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table style="width: 100%;">
+                <tbody id="view-stock-keys-list">
+                    <!-- Keys will appear here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- WALLET HISTORY MODAL -->
+<div class="modal-overlay" id="wallet-history-modal">
+    <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 id="history-modal-title">Wallet History</h3>
+            <button class="close-modal" onclick="closeModal('wallet-history-modal')">×</button>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Date & Time</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody id="wallet-history-list">
+                    <!-- History logs will appear here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="coupon-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="coupon-modal-title">Create New Coupon</h3>
+            <button class="close-modal" onclick="closeModal('coupon-modal')">×</button>
+        </div>
+        <div class="input-group">
+            <label>Coupon Code (E.g. SALE50, DIWALI100)</label>
+            <input id="coupon-code" placeholder="Enter Code" style="text-transform: uppercase;">
+        </div>
+        <div class="input-group">
+            <label>Flat Discount Amount (₹)</label>
+            <input type="number" id="coupon-discount" placeholder="e.g. 50">
+        </div>
+        <div class="input-group">
+            <label>Usage Limit (Kitne log use kar sakte hain)</label>
+            <input type="number" id="coupon-limit" placeholder="e.g. 100">
+        </div>
+        <div class="input-group">
+            <label>Expiry Date (Valid Till)</label>
+            <input type="date" id="coupon-expiry">
+        </div>
+        <button class="btn btn-primary" id="save-coupon-btn" style="width: 100%; margin-top: 10px;">Save Coupon</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="reseller-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="reseller-modal-title">Add Reseller Account</h3>
+            <button class="close-modal" onclick="closeModal('reseller-modal')">×</button>
+        </div>
+        <div class="input-group">
+            <label>Reseller Email</label>
+            <input id="reseller-email" type="email" placeholder="reseller@gmail.com">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input id="reseller-pass" type="text" placeholder="Enter Password">
+        </div>
+        <div class="input-group">
+            <label>Validity (Days) <small style="color:var(--warning)">Kitne din chalega?</small></label>
+            <input id="reseller-validity" type="number" placeholder="E.g. 30" value="30">
+        </div>
+        <button class="btn btn-primary" id="save-reseller-btn" style="width: 100%; margin-top: 10px;">Create Reseller</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="panel-modal">
+    <div class="modal">
+        <div class="modal-header"><h3 id="panel-modal-title">Add Panel</h3><button class="close-modal" onclick="closeModal('panel-modal')">×</button></div>
+        <div class="input-group"><label>Panel Name</label><input id="panel-name" placeholder="e.g., VIP Panel Pro"></div>
+        <div class="input-group"><label>Description</label><textarea id="panel-desc" rows="2" placeholder="Aimbot, ESP, Wallhack"></textarea></div>
+        
+        <div class="input-group">
+            <label>Category (YouTube Style Filter)</label>
+            <select id="panel-category" style="border-color: var(--neon-purple);">
+                <option value="Root Panel">Root Panel</option>
+                <option value="Root-STEAMER PANEL">Root-STEAMER PANEL</option>
+                <option value="Non Root panel">Non Root panel</option>
+                <option value="I Phone panel">I Phone panel</option>
+                <option value="PC panel">PC panel</option>
+                <option value="PUBG panel">PUBG panel</option>
+                <option value="Moba Legends">Moba Legends</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Video Link (YouTube/Firebase URL)</label>
+            <input id="panel-video" placeholder="https://youtu.be/...">
+        </div>
+        <div class="input-group"><label>Access Link</label><input id="panel-link" placeholder="https://t.me/..."></div>
+        
+        <div class="input-group"><label>Update Link (Telegram/etc)</label><input id="panel-update-link" placeholder="https://t.me/..."></div>
+        <div class="input-group"><label>Feedback Link (Telegram/etc)</label><input id="panel-feedback-link" placeholder="https://t.me/..."></div>
+        
+        <div class="input-group"><label>Status</label><select id="panel-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        
+        <p style="font-size: 12px; color: var(--warning); margin-bottom: 5px;"><i class="fas fa-info-circle"></i> <b>IMPORTANT:</b> Plan Select karein taki Key Stock auto-connect ho jaye!</p>
+        
+        <div class="input-group"><label>Plans</label></div>
+        <div id="plans-container"></div>
+        <button class="btn btn-primary" id="add-plan-btn" style="margin-bottom: 10px;"><i class="fas fa-plus"></i> Add Plan</button>
+        <button class="btn btn-success" id="save-panel-btn" style="margin-top:15px; width: 100%;"><i class="fas fa-save"></i> Save Panel</button>
+        <input type="hidden" id="edit-panel-id">
+    </div>
+</div>
+
+<div class="modal-overlay" id="promo-modal"><div class="modal"><div class="modal-header"><h3 id="promo-modal-title">Add Promotion</h3><button class="close-modal" onclick="closeModal('promo-modal')">×</button></div><div class="input-group"><label>Title</label><input id="promo-title" placeholder="Special Offer"></div><div class="input-group"><label>Image URL</label><input id="promo-image" placeholder="https://..."></div><div class="input-group"><label>Link</label><input id="promo-link" placeholder="https://..."></div><div class="input-group"><label>Status</label><select id="promo-status"><option value="true">Active</option><option value="false">Inactive</option></select></div><button class="btn btn-primary" id="save-promo-btn">Save</button><input type="hidden" id="edit-promo-id"></div></div>
+
+<!-- HYBRID DELIVERY MODAL (KEY OR USERPASS) -->
+<div class="modal-overlay" id="key-delivery-modal">
+    <div class="modal">
+        <div class="modal-header"><h3>Deliver Order</h3><button class="close-modal" onclick="closeModal('key-delivery-modal')">×</button></div>
+        <div class="input-group"><label>User Email</label><input id="kd-user-email" readonly style="background:rgba(0,0,0,0.3);"></div>
+        <div class="input-group"><label>Panel</label><input id="kd-panel-name" readonly style="background:rgba(0,0,0,0.3);"></div>
+        <div class="input-group"><label>Plan</label><input id="kd-plan" readonly style="background:rgba(0,0,0,0.3);"></div>
+        
+        <div class="input-group">
+            <label>Delivery Type (Kya dena hai?)</label>
+            <select id="kd-delivery-type" onchange="toggleDeliveryInputs()" style="border-color: var(--neon-purple);">
+                <option value="key">License Key</option>
+                <option value="userpass">Username & Password</option>
+            </select>
+        </div>
+
+        <div id="kd-key-container" class="input-group">
+            <label>License Key</label>
+            <input id="kd-key" placeholder="Enter license key (e.g., ABC12-XYZ34-MNOP5)">
+        </div>
+
+        <div id="kd-userpass-container" class="hidden">
+            <div class="input-group">
+                <label>Username</label>
+                <input id="kd-username" placeholder="Enter Username for user">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input id="kd-password" placeholder="Enter Password for user">
+            </div>
+        </div>
+
+        <button class="btn btn-success" id="kd-confirm-btn" style="width: 100%; margin-top: 10px;">Deliver Order Now</button>
+        <input type="hidden" id="kd-user-uid">
+        <input type="hidden" id="kd-purchase-id">
+        <input type="hidden" id="kd-price">
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    // ADDED signInAnonymously TO BYPASS FIREBASE AUTH RULE FOR RESELLERS
+    import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, push, remove, update, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyCnw9KOZFUQjtqp9j0F4EWCpVEOw0wSmpg", authDomain: "riyaz-92e9c.firebaseapp.com", databaseURL: "https://riyaz-92e9c-default-rtdb.firebaseio.com", projectId: "riyaz-92e9c", storageBucket: "riyaz-92e9c.firebasestorage.app", messagingSenderId: "353640412227", appId: "1:353640412227:android:16a337b90078b40c8f50f6"};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    // ==========================================
+    // 🚀 EMAILJS HELPER FUNCTION (User Notification)
+    // ==========================================
+    function sendUserEmailAlert(to_email, subject, message) {
+        if(!to_email || to_email === 'User' || to_email === 'undefined') return; 
+        var templateParams = {
+            to_email: to_email,
+            subject: subject,
+            name: "Riyaz Official Store",
+            message: message
+        };
+        emailjs.send("service_jyzfz3b", "template_84pyjax", templateParams)
+            .then(function(res) { console.log('Email Sent Success: ', res.status); })
+            .catch(function(err) { console.error('Email Sent Failed: ', err); });
+    }
+
+    // ==========================================
+    // 🚀 MULTI-TENANT (RESELLER) ROUTING CORE 🚀
+    // ==========================================
+    let currentAdmin = null;
+    let currentStoreId = 'master'; 
+    
+    let plansCount = 0; 
+    const adminEmails = ["mp4990453@gmail.com", "your-email@gmail.com"];
+    
+    window.copyToClipboard = (text) => {
+        const tempInput = document.createElement('input');
+        document.body.appendChild(tempInput);
+        tempInput.value = text;
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+    };
+
+    window.copyStoreLink = () => {
+        const linkInput = document.getElementById('my-store-link').value;
+        if(linkInput) {
+            window.copyToClipboard(linkInput);
+            showToast('Store Link Copied! Send it to your users.');
+        }
+    };
+
+    function showToast(msg, type='success') { const c=document.getElementById('toast-container'); const t=document.createElement('div'); t.className=`toast ${type}`; t.innerHTML=`<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${msg}`; c.appendChild(t); setTimeout(()=>t.remove(),3500); }
+    window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+    window.openModal = (id) => document.getElementById(id).classList.add('active');
+
+    window.toggleDeliveryInputs = () => {
+        const type = document.getElementById('kd-delivery-type').value;
+        if(type === 'key') {
+            document.getElementById('kd-key-container').classList.remove('hidden');
+            document.getElementById('kd-userpass-container').classList.add('hidden');
+        } else {
+            document.getElementById('kd-key-container').classList.add('hidden');
+            document.getElementById('kd-userpass-container').classList.remove('hidden');
+        }
+    };
+
+    function checkLoginState(firebaseUser) {
+        const l = document.getElementById('loader');
+        const as = document.getElementById('auth-screen');
+        const aa = document.getElementById('admin-app');
+        const resellerMenu = document.getElementById('menu-resellers');
+        
+        const resellerEmail = localStorage.getItem('reseller_logged_in_email');
+        const resellerId = localStorage.getItem('reseller_logged_in_id');
+
+        let currentUrlPath = window.location.href.split('?')[0];
+        let pathParts = currentUrlPath.split('/');
+        pathParts[pathParts.length - 1] = 'index.html'; 
+        const domainURL = pathParts.join('/');
+
+        if (firebaseUser && adminEmails.includes(firebaseUser.email)) {
+            currentAdmin = firebaseUser; 
+            currentStoreId = 'master'; 
+            document.getElementById('admin-email-display').innerHTML = `<i class="fas fa-crown" style="color:var(--warning);"></i> ${firebaseUser.email}`; 
+            resellerMenu.style.display = 'flex'; 
+            
+            document.getElementById('my-store-link').value = `${domainURL}?store=master`;
+            
+            showApp(as, aa, l);
+        } 
+        else if (resellerEmail && resellerId) {
+            currentAdmin = { email: resellerEmail, role: 'reseller', id: resellerId };
+            currentStoreId = resellerId; 
+            document.getElementById('admin-email-display').innerHTML = `<i class="fas fa-user-tie" style="color:var(--success);"></i> ${resellerEmail}`; 
+            resellerMenu.style.display = 'none'; 
+            
+            document.getElementById('my-store-link').value = `${domainURL}?store=${resellerId}`;
+            
+            showApp(as, aa, l);
+        }
+        else {
+            as.style.display = 'flex'; 
+            aa.style.display = 'none'; 
+            l.style.display = 'none'; 
+        }
+    }
+
+    document.getElementById('admin-login-btn').onclick = async () => { 
+        const e = document.getElementById('admin-email').value.trim();
+        const p = document.getElementById('admin-pass').value; 
+        if(!e || !p) return showToast("Enter credentials", "error"); 
+        
+        const loginBtn = document.getElementById('admin-login-btn');
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+        loginBtn.disabled = true;
+
+        if (adminEmails.includes(e)) {
+            try { 
+                await signInWithEmailAndPassword(auth, e, p); 
+                showToast("Master Admin Login Successful!"); 
+            } catch(err) { showToast("Invalid Master Admin credentials", "error"); } 
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
+            loginBtn.disabled = false;
+            return;
+        }
+        
+        try {
+            const snap = await get(ref(db, 'resellers'));
+            let isResellerValid = false, isBanned = false, isExpired = false, validId = null;
+            if (snap.exists()) {
+                Object.entries(snap.val()).forEach(([id, r]) => { 
+                    if (r.email === e && r.password === p) { 
+                        isResellerValid = true; 
+                        validId = id;
+                        if (r.status === 'banned') isBanned = true; 
+                        if (r.validityEnd && Date.now() > r.validityEnd) isExpired = true;
+                    } 
+                });
+            }
+            
+            if (isResellerValid) {
+                if (isBanned) {
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard'; loginBtn.disabled = false;
+                    return showToast("Your account is BANNED by Master Admin", "error");
+                }
+                if (isExpired) {
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard'; loginBtn.disabled = false;
+                    return showToast("Your account validity has EXPIRED! Contact Master Admin.", "error");
+                }
+                
+                // 🔥 BUG FIX: SIGN IN ANONYMOUSLY TO BYPASS FIREBASE DB SECURITY RULES FOR RESELLER 🔥
+                try {
+                    await signInAnonymously(auth);
+                } catch(anonErr) {
+                    console.warn("Anon Auth Error (Minor):", anonErr);
+                }
+
+                localStorage.setItem('reseller_logged_in_email', e);
+                localStorage.setItem('reseller_logged_in_id', validId);
+                showToast("Login Successful!"); 
+                checkLoginState(auth.currentUser); 
+            } else {
+                showToast("Invalid Email or Password", "error");
+            }
+        } catch(err) { 
+            console.error(err);
+            showToast("Database error or Permission Denied", "error"); 
+        }
+
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
+        loginBtn.disabled = false;
+    };
+
+    document.getElementById('admin-logout-btn').onclick = async () => { 
+        if (localStorage.getItem('reseller_logged_in_email')) { 
+            localStorage.removeItem('reseller_logged_in_email'); 
+            localStorage.removeItem('reseller_logged_in_id'); 
+            checkLoginState(null); 
+            showToast("Reseller Logged Out");
+        } else {
+            await signOut(auth); 
+        }
+    };
+
+    const getDbPath = (path) => {
+        if (currentStoreId === 'master') return path; 
+        return `stores/${currentStoreId}/${path}`; 
+    };
+
+    function showApp(as, aa, l) {
+        as.style.display = 'none'; aa.style.display = 'block'; l.style.display = 'none'; 
+        loadDashboardStats(); loadPanels(); loadPromotions(); loadCoupons();
+        loadPaymentData(); loadUsers(); loadKeyData(); loadSettings(); 
+        if(currentStoreId === 'master') loadResellers(); 
+        loadStockInventory(); 
+        navigateAdmin('dashboard');
+    }
+
+    onAuthStateChanged(auth, (user) => { checkLoginState(user); });
+    
+    window.navigateAdmin = function(page){ 
+        if(!page) return;
+        document.querySelectorAll('.main-content > div').forEach(d=>d.classList.add('hidden')); 
+        const pageEl = document.getElementById(`${page}-page`);
+        if(pageEl) pageEl.classList.remove('hidden'); 
+        document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active')); 
+        
+        let sidebarTarget = page;
+        if(page === 'pending-payments' || page === 'approved-payments' || page === 'rejected-payments') sidebarTarget = 'payments-dashboard';
+        else if (page === 'pending-keys' || page === 'delivered-keys') sidebarTarget = 'keys-dashboard';
+
+        const target = document.querySelector(`.sidebar-item[data-page="${sidebarTarget}"]`);
+        if (target) target.classList.add('active'); 
+    };
+
+    document.querySelectorAll('.sidebar-item').forEach(i=>{ 
+        if(i.dataset.page) { i.addEventListener('click',()=>navigateAdmin(i.dataset.page)); }
+    });
+    
+    // ==========================================
+    // 🚀 KEY STOCK (INVENTORY) SYSTEM 🚀
+    // ==========================================
+
+    window.openStockModal = async () => {
+        const panelSelect = document.getElementById('stock-panel-select');
+        panelSelect.innerHTML = '<option value="">Loading panels...</option>';
+        openModal('stock-modal');
+        
+        try {
+            const snap = await get(ref(db, getDbPath('panels')));
+            panelSelect.innerHTML = '<option value="" disabled selected>-- Select Panel --</option>';
+            if(snap.exists()) {
+                Object.entries(snap.val()).forEach(([id, panel]) => {
+                    panelSelect.innerHTML += `<option value="${id}">${panel.name}</option>`;
+                });
+            } else {
+                panelSelect.innerHTML = '<option value="" disabled>No panels found. Add a panel first.</option>';
+            }
+        } catch(e) {
+            showToast("Failed to load panels for stock", "error");
+        }
+    };
+
+    async function loadStockInventory() {
+        try {
+            const panelsSnap = await get(ref(db, getDbPath('panels')));
+            let panelsMap = {};
+            if(panelsSnap.exists()) {
+                Object.entries(panelsSnap.val()).forEach(([id, p]) => {
+                    panelsMap[id] = p.name;
+                });
+            }
+
+            onValue(ref(db, getDbPath('key_stock')), (snap) => {
+                const tbody = document.getElementById('stock-list');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                
+                if(!snap.exists()) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No keys in stock. Please add some keys!</td></tr>';
+                    return;
+                }
+
+                const stockData = snap.val();
+                let htmlContent = '';
+                
+                Object.keys(stockData).forEach(panelId => {
+                    const panelName = panelsMap[panelId] || 'Unknown Panel (' + panelId.substring(0,6) + '...)';
+                    const panelDurations = stockData[panelId];
+                    
+                    Object.keys(panelDurations).forEach(durationKey => {
+                        const keysObject = panelDurations[durationKey];
+                        const keysCount = Object.keys(keysObject).length;
+                        
+                        let displayLabel = durationKey.replace('_', ' ').toUpperCase();
+                        
+                        if (keysCount > 0) {
+                            htmlContent += `
+                                <tr>
+                                    <td><i class="fas fa-box" style="color:var(--neon-cyan);"></i> ${panelName}</td>
+                                    <td><i class="fas fa-clock" style="color:var(--neon-purple);"></i> <strong>${displayLabel}</strong></td>
+                                    <td><span style="color:var(--success); font-weight:800; font-size:16px;">${keysCount}</span> Keys Left</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" onclick="viewStockKeys('${panelId}', '${durationKey}', '${displayLabel}', '${panelName.replace(/'/g, "\\'")}')"><i class="fas fa-eye"></i> View</button>
+                                        <button class="btn btn-danger btn-sm" onclick="clearStock('${panelId}', '${durationKey}', '${displayLabel}', '${panelName.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> Clear</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    });
+                });
+                
+                if(htmlContent === '') {
+                    htmlContent = '<tr><td colspan="4" style="text-align:center;">All stock is empty.</td></tr>';
+                }
+                tbody.innerHTML = htmlContent;
+            });
+        } catch(e) {
+            console.error("Stock load error", e);
+        }
+    }
+
+    document.getElementById('save-stock-btn').onclick = async () => {
+        const panelId = document.getElementById('stock-panel-select').value;
+        const duration = document.getElementById('stock-duration').value;
+        const keysInput = document.getElementById('stock-keys-input').value.trim();
+        const btn = document.getElementById('save-stock-btn');
+        
+        if (!panelId) return showToast("Pehle Panel select karein!", "error");
+        if (!keysInput) return showToast("Pehle keys enter karein!", "error");
+
+        const keysArray = keysInput.split('\n').map(k => k.trim()).filter(k => k !== '');
+        if (keysArray.length === 0) return showToast("Invalid keys format!", "error");
+
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
+        try {
+            const updates = {};
+            keysArray.forEach(key => {
+                const newKeyRef = push(ref(db, getDbPath(`key_stock/${panelId}/${duration}`)));
+                updates[getDbPath(`key_stock/${panelId}/${duration}/${newKeyRef.key}`)] = key;
+            });
+            
+            await update(ref(db), updates);
+            
+            showToast(`${keysArray.length} Keys successfully added to selected panel!`);
+            closeModal('stock-modal');
+            document.getElementById('stock-keys-input').value = ''; 
+            document.getElementById('stock-panel-select').value = ''; 
+        } catch(error) {
+            console.error(error);
+            showToast("Failed to save keys: " + error.message, "error");
+        }
+        
+        btn.innerHTML = ogHtml;
+        btn.disabled = false;
+    };
+
+    window.clearStock = async (panelId, durationKey, label, panelName) => {
+        if(confirm(`Are you sure you want to DELETE ALL remaining keys for\nPanel: ${panelName}\nPlan: ${label}?`)) {
+            try {
+                await remove(ref(db, getDbPath(`key_stock/${panelId}/${durationKey}`)));
+                showToast(`${panelName} - ${label} stock cleared!`);
+            } catch(e) {
+                showToast("Error clearing stock", "error");
+            }
+        }
+    };
+
+    window.viewStockKeys = async (panelId, durationKey, label, panelName) => {
+        document.getElementById('view-stock-title').innerText = `${panelName} - ${label} Keys`;
+        const listContainer = document.getElementById('view-stock-keys-list');
+        listContainer.innerHTML = '<tr><td style="text-align:center;">Loading...</td></tr>';
+        openModal('view-stock-modal');
+
+        try {
+            const snap = await get(ref(db, getDbPath(`key_stock/${panelId}/${durationKey}`)));
+            listContainer.innerHTML = '';
+            
+            if(snap.exists()) {
+                let idx = 1;
+                snap.forEach(child => {
+                    const keyId = child.key;
+                    const keyValue = child.val();
+                    
+                    listContainer.innerHTML += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="width: 30px; color: var(--text-muted);">${idx}.</td>
+                            <td style="font-family: monospace; color: var(--neon-cyan); font-size: 14px;">${keyValue}</td>
+                            <td style="text-align: right;">
+                                <button class="btn btn-danger btn-icon-only" onclick="deleteSingleStockKey('${panelId}', '${durationKey}', '${keyId}', '${label}', '${panelName.replace(/'/g, "\\'")}')" title="Delete Key"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    idx++;
+                });
+            } else {
+                listContainer.innerHTML = '<tr><td style="text-align:center;">No keys found.</td></tr>';
+            }
+        } catch(e) {
+            listContainer.innerHTML = '<tr><td style="text-align:center; color:red;">Error loading keys</td></tr>';
+        }
+    };
+
+    window.deleteSingleStockKey = async (panelId, durationKey, keyId, label, panelName) => {
+        if(confirm("Delete this single key from stock?")) {
+            try {
+                await remove(ref(db, getDbPath(`key_stock/${panelId}/${durationKey}/${keyId}`)));
+                showToast("Key deleted from stock!");
+                viewStockKeys(panelId, durationKey, label, panelName); 
+            } catch(e) {
+                showToast("Error deleting key", "error");
+            }
+        }
+    };
+
+    // ==========================================
+    // 🚀 DASHBOARD & EXISTING LOGIC BELOW 🚀
+    // ==========================================
+
+    async function loadDashboardStats(){ 
+        try {
+            const u=await get(ref(db,getDbPath('users'))), p=await get(ref(db,getDbPath('panels'))), pay=await get(ref(db,getDbPath('payments'))), purchases=await get(ref(db,getDbPath('purchases'))); 
+            let tu=0, tp=0, pp=0, pk=0; 
+            if(u.exists()) tu=Object.keys(u.val()).length; 
+            if(p.exists()) Object.values(p.val()).forEach(pn=>{ if(pn.status==='active') tp++; }); 
+            if(pay.exists()) Object.values(pay.val()).forEach(paym=>{ if(paym.status==='pending') pp++; }); 
+            if(purchases.exists()){ Object.values(purchases.val()).forEach(uidPurchases=>{ Object.values(uidPurchases).forEach(pur=>{ if(pur.keyStatus==='pending') pk++; }); }); } 
+            document.getElementById('total-users').innerText=tu; 
+            document.getElementById('total-panels').innerText=tp; 
+            document.getElementById('pending-payments-dash').innerText=pp; 
+            document.getElementById('pending-keys-dash').innerText=pk; 
+        } catch(e) {
+            console.warn("Dashboard stats load error:", e);
+        }
+    }
+    
+    async function loadKeyData(){ 
+        try {
+            const snap = await get(ref(db,getDbPath('purchases'))); 
+            const pendingTbody = document.getElementById('pending-keys-list'); 
+            const deliveredTbody = document.getElementById('delivered-keys-list'); 
+            
+            pendingTbody.innerHTML = ''; 
+            deliveredTbody.innerHTML = ''; 
+            
+            let totalReq = 0, pendingReq = 0, deliveredReq = 0;
+
+            if(!snap.exists()){ 
+                updateKeyStats(0,0,0);
+                pendingTbody.innerHTML='<tr><td colspan="6">No pending requests</td></tr>'; 
+                deliveredTbody.innerHTML='<tr><td colspan="6">No delivered keys yet</td></tr>'; 
+                return; 
+            } 
+            
+            const requests = []; 
+            for(const [uid,userPurchases] of Object.entries(snap.val())){ 
+                for(const [pid,purchase] of Object.entries(userPurchases)){ 
+                    totalReq++;
+                    if(purchase.keyStatus === 'pending') pendingReq++;
+                    if(purchase.keyStatus === 'delivered') deliveredReq++;
+
+                    const userSnap = await get(ref(db,getDbPath(`users/${uid}`))); 
+                    let actualEmail = uid;
+                    if(userSnap.exists() && userSnap.val().email) actualEmail = userSnap.val().email;
+
+                    requests.push({uid, pid, ...purchase, userEmail: actualEmail}); 
+                } 
+            } 
+            
+            updateKeyStats(totalReq, pendingReq, deliveredReq);
+
+            requests.sort((a,b) => {
+                const timeA = typeof a.date === 'number' ? a.date : 0;
+                const timeB = typeof b.date === 'number' ? b.date : 0;
+                return timeB - timeA;
+            });
+
+            let pendingFound = false;
+            let deliveredFound = false;
+
+            for(const req of requests){ 
+                const row = document.createElement('tr'); 
+                const safePanelName = (req.panelName || '').replace(/'/g, "\\'");
+                const safePlanName = (req.label || req.plan || '').replace(/'/g, "\\'");
+                
+                let dateVal = typeof req.date === 'number' ? req.date : new Date(req.date).getTime();
+                if(isNaN(dateVal)) dateVal = Date.now();
+                const dateStr = new Date(dateVal).toLocaleDateString();
+
+                if(req.keyStatus === 'pending') {
+                    pendingFound = true;
+                    row.innerHTML=`<td>${req.userEmail}</td><td>${req.panelName}</td><td><strong style="color:var(--warning)">${req.label||req.plan}</strong></td><td>₹${req.price}</td><td><small>${dateStr}</small></td>
+                    <td>
+                        <div style="display:flex; gap:5px; flex-wrap: wrap;">
+                            <button class="btn btn-success btn-sm" onclick="openKeyDeliveryModal('${req.uid}','${req.pid}','${req.userEmail}','${safePanelName}','${safePlanName}', '${req.price}')" style="padding: 6px 10px;"><i class="fas fa-check"></i> Deliver</button>
+                            <button class="btn btn-danger btn-sm" onclick="cancelAndRefundOrder('${req.uid}','${req.pid}','${req.userEmail}', ${req.price})" style="padding: 6px 10px;"><i class="fas fa-undo"></i> Refund</button>
+                        </div>
+                    </td>`; 
+                    pendingTbody.appendChild(row); 
+                } 
+                else if(req.keyStatus === 'delivered') {
+                    deliveredFound = true;
+                    row.innerHTML=`<td>${req.userEmail}</td><td>${req.panelName}</td><td>${req.label||req.plan}</td><td>₹${req.price}</td><td><small>${dateStr}</small></td>
+                    <td><span style="color:var(--neon-cyan); font-family:monospace; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:4px; border: 1px solid var(--neon-cyan-dim);">${req.key}</span></td>`; 
+                    deliveredTbody.appendChild(row); 
+                }
+            } 
+            
+            if(!pendingFound) pendingTbody.innerHTML='<tr><td colspan="6">No pending requests</td></tr>'; 
+            if(!deliveredFound) deliveredTbody.innerHTML='<tr><td colspan="6">No delivered keys yet</td></tr>'; 
+        } catch(e) { console.error("Key load error", e); }
+    }
+
+    function updateKeyStats(tot, pen, del) { document.getElementById('km-total').innerText = tot; document.getElementById('km-pending').innerText = pen; document.getElementById('km-delivered').innerText = del; }
+    
+    window.openKeyDeliveryModal = (uid,pid,email,panelName,plan, price)=>{ 
+        document.getElementById('kd-user-uid').value=uid; 
+        document.getElementById('kd-purchase-id').value=pid; 
+        document.getElementById('kd-user-email').value=email; 
+        document.getElementById('kd-panel-name').value=panelName; 
+        document.getElementById('kd-plan').value=plan; 
+        document.getElementById('kd-price').value=price;
+        
+        document.getElementById('kd-key').value=''; 
+        document.getElementById('kd-username').value='';
+        document.getElementById('kd-password').value='';
+        document.getElementById('kd-delivery-type').value = 'key';
+        toggleDeliveryInputs();
+
+        openModal('key-delivery-modal'); 
+    };
+
+    window.cancelAndRefundOrder = async (uid, pid, passedEmail, price) => {
+        if(confirm(`Order delete karein aur ₹${price} ke wallet me Refund karein?`)) {
+            try {
+                await remove(ref(db, getDbPath(`purchases/${uid}/${pid}`)));
+                
+                const balRef = ref(db, getDbPath(`users/${uid}/balance`));
+                const snap = await get(balRef);
+                const newBal = (parseFloat(snap.val()) || 0) + parseFloat(price);
+                await set(balRef, newBal);
+
+                await push(ref(db, getDbPath(`wallet_history/${uid}`)), {
+                    amount: parseFloat(price),
+                    type: 'add',
+                    date: serverTimestamp(),
+                    by: 'Order Cancelled',
+                    details: 'Admin refunded your amount'
+                });
+
+                // ==========================================
+                // 🚀 EMAILJS: KEY CANCEL/REFUND NOTIFICATION
+                // ==========================================
+                try {
+                    if(passedEmail && passedEmail !== 'undefined') {
+                        const uName = passedEmail.split('@')[0];
+                        const msg = `Dear ${uName},\n\nHumne aapki purchase request ko review kiya, lekin kisi wajah se hum is order ko pura nahi kar paye. Isliye aapka order Reject kar diya gaya hai.\n\nImportant Update:\nPareshaan na hon, aapne jo amount (₹${price}) is order ke liye pay kiya tha, wo aapke wallet me successfully refund kar diya gaya hai. Aap apne wallet ka balance check kar sakte hain.\n\nAgar aap chahein, toh aap dobara naya order place kar sakte hain.\n\nBest Regards,\nRiyaz Official Store Team`;
+                        sendUserEmailAlert(passedEmail, "🔄 Update: Your Order has been Rejected & Refunded", msg);
+                    }
+                } catch(emailErr) { console.error("EmailJS Error: ", emailErr); }
+                // ==========================================
+
+                showToast(`Order Cancelled aur ₹${price} Refund ho gaye!`, "success");
+                loadKeyData(); loadDashboardStats();
+            } catch(e) {
+                console.error(e);
+                showToast("Refund fail ho gaya. Internet check karein.", "error");
+            }
+        }
+    };
+    
+    document.getElementById('kd-confirm-btn').onclick = async ()=>{ 
+        const uid = document.getElementById('kd-user-uid').value, 
+              pid = document.getElementById('kd-purchase-id').value, 
+              type = document.getElementById('kd-delivery-type').value;
+              
+        let finalDeliveryText = "";
+
+        if(type === 'key') {
+            const key = document.getElementById('kd-key').value.trim();
+            if(!key) return showToast("Enter license key","error"); 
+            finalDeliveryText = key;
+        } else {
+            const user = document.getElementById('kd-username').value.trim();
+            const pass = document.getElementById('kd-password').value.trim();
+            if(!user || !pass) return showToast("Username aur password dono enter karein","error");
+            finalDeliveryText = `Username: ${user} | Password: ${pass}`;
+        }
+        
+        if(!uid) return showToast("System Error: User ID not found!","error");
+
+        const btn = document.getElementById('kd-confirm-btn');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        try { 
+            await update(ref(db,getDbPath(`purchases/${uid}/${pid}`)),{ key: finalDeliveryText, keyStatus:'delivered' }); 
+
+            // ==========================================
+            // 🚀 EMAILJS: KEY DELIVERED NOTIFICATION
+            // ==========================================
+            try {
+                const uEmail = document.getElementById('kd-user-email').value;
+                const panelName = document.getElementById('kd-panel-name').value;
+                const price = document.getElementById('kd-price').value;
+                
+                if(uEmail && uEmail !== 'undefined') {
+                    const uName = uEmail.split('@')[0];
+                    const msg = `Dear ${uName},\n\nAapka order successfully process ho gaya hai! Aapne jo ${panelName} buy ki thi, wo ab aapke account me deliver kar di gayi hai.\n\nPurchase Summary:\n- Item: ${panelName}\n- Price: ₹${price}\n- Status: Delivered / Completed\n\nAap apni Key dekhne ke liye apne panel ki "Order History" ya "My Keys" me jaa sakte hain.\n\nEnjoy your purchase!\n\nBest Regards,\nRiyaz Official Store Team`;
+                    sendUserEmailAlert(uEmail, "✅ Your Key is Ready! Order Completed", msg);
+                }
+            } catch(emailErr) { console.error("EmailJS Error: ", emailErr); }
+            // ==========================================
+
+            showToast("Order delivered successfully!"); 
+            closeModal('key-delivery-modal'); 
+            loadKeyData(); loadDashboardStats(); 
+        } catch(error) { 
+            showToast("Failed to deliver", "error"); 
+        }
+
+        btn.innerHTML = ogHtml;
+        btn.disabled = false;
+    };
+
+    // ==========================================
+    // 🚀 PANEL PLAN LOGIC 🚀
+    // ==========================================
+    async function loadPanels(){ 
+        try {
+            const snap = await get(ref(db,getDbPath('panels'))); 
+            const tbody = document.getElementById('panels-list'); tbody.innerHTML=''; 
+            if(!snap.exists()) return; 
+            Object.entries(snap.val()).forEach(([id,panel])=>{ 
+                const row=document.createElement('tr'); 
+                row.innerHTML=`<td><i class="fas fa-cube"></i> ${panel.name}</td>
+                <td><span style="color:var(--neon-cyan); background: rgba(0,240,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 11px;">${panel.category || 'Root Panel'}</span></td>
+                <td><span style="color:${panel.status==='active'?'#0f0':'#f00'}">● ${panel.status}</span></td><td>${panel.plans?Object.keys(panel.plans).length:0} plans</td><td style="color:var(--neon-purple); font-weight:bold;">${panel.addedBy || 'Master Admin'}</td><td><button class="btn btn-sm" onclick="editPanel('${id}')"><i class="fas fa-edit"></i> Edit</button> <button class="btn btn-danger btn-sm" onclick="deletePanel('${id}')"><i class="fas fa-trash"></i></button></td>`; 
+                tbody.appendChild(row); 
+            }); 
+        } catch(e) { console.error("Error loading panels", e); }
+    }
+    
+    window.editPanel = async (id) => { 
+        try {
+            const snap=await get(ref(db,getDbPath(`panels/${id}`))); const p=snap.val(); if(!p) return; 
+            document.getElementById('panel-modal-title').innerText='Edit Panel'; 
+            document.getElementById('panel-name').value=p.name||''; 
+            document.getElementById('panel-desc').value=p.description||''; 
+            document.getElementById('panel-category').value=p.category||'Root Panel'; 
+            document.getElementById('panel-video').value=p.video||''; 
+            document.getElementById('panel-link').value=p.link||''; 
+            document.getElementById('panel-update-link').value=p.updateLink||''; 
+            document.getElementById('panel-feedback-link').value=p.feedbackLink||''; 
+            document.getElementById('panel-status').value=p.status||'active'; 
+            document.getElementById('edit-panel-id').value=id; 
+            
+            document.getElementById('plans-container').innerHTML=''; 
+            plansCount = 0;
+            
+            if(p.plans){ 
+                Object.entries(p.plans).forEach(([key,plan])=>{ 
+                    let dur = "1_day"; 
+                    if(["1_hour","1_day","3_days","5_days","7_days","10_days","15_days","30_days","lifetime"].includes(key)) dur=key; 
+                    else { 
+                        const lbl=(plan.label||'').toLowerCase(); 
+                        if(lbl.includes('hour')) dur='1_hour'; 
+                        else if(lbl.includes('3')) dur='3_days'; 
+                        else if(lbl.includes('5')) dur='5_days'; 
+                        else if(lbl.includes('7')||lbl.includes('week')) dur='7_days'; 
+                        else if(lbl.includes('10')) dur='10_days'; 
+                        else if(lbl.includes('15')) dur='15_days'; 
+                        else if(lbl.includes('30')||lbl.includes('month')) dur='30_days'; 
+                        else if(lbl.includes('life')) dur='lifetime'; 
+                    }
+                    addPlanField(dur, plan.label, plan.price); 
+                }); 
+            } else {
+                addPlanField(); 
+            }
+            openModal('panel-modal'); 
+        } catch(e) { showToast("Error editing panel", "error"); }
+    };
+
+    window.deletePanel=async(id)=>{ 
+        if(confirm('Delete?')){ 
+            try {
+                await remove(ref(db,getDbPath(`panels/${id}`))); 
+                showToast('Panel deleted!'); loadPanels(); loadDashboardStats(); 
+            } catch(e) { showToast("Delete failed", "error"); }
+        } 
+    };
+    
+    window.addPlanField = (durVal='1_day', labelVal='', priceVal='') => { 
+        const div=document.createElement('div'); 
+        div.className='plan-item'; 
+        div.id=`plan-row-${plansCount}`;
+        div.innerHTML=`
+            <select id="plan-duration-${plansCount}" style="flex:1; min-width:110px; padding:10px;">
+                <option value="1_hour" ${durVal==='1_hour'?'selected':''}>1 Hour</option>
+                <option value="1_day" ${durVal==='1_day'?'selected':''}>1 Day</option>
+                <option value="3_days" ${durVal==='3_days'?'selected':''}>3 Days</option>
+                <option value="5_days" ${durVal==='5_days'?'selected':''}>5 Days</option>
+                <option value="7_days" ${durVal==='7_days'?'selected':''}>7 Days</option>
+                <option value="10_days" ${durVal==='10_days'?'selected':''}>10 Days</option>
+                <option value="15_days" ${durVal==='15_days'?'selected':''}>15 Days</option>
+                <option value="30_days" ${durVal==='30_days'?'selected':''}>30 Days</option>
+                <option value="lifetime" ${durVal==='lifetime'?'selected':''}>Lifetime</option>
+            </select>
+            <input placeholder="Display Name (e.g VIP 1 Day)" id="plan-label-${plansCount}" value="${labelVal || ''}" style="flex:2; min-width: 140px;">
+            <input placeholder="Price" type="number" id="plan-price-${plansCount}" value="${priceVal || ''}" style="flex:1; min-width: 80px;">
+            <button class="btn btn-danger btn-sm" onclick="removePlan(${plansCount})"><i class="fas fa-trash"></i></button>
+        `; 
+        document.getElementById('plans-container').appendChild(div); 
+        plansCount++; 
+    }
+    
+    window.removePlan = (idx) => { const el=document.getElementById(`plan-row-${idx}`); if(el) el.remove(); };
+    
+    document.getElementById('add-plan-btn').onclick = () => addPlanField();
+    
+    document.getElementById('save-panel-btn').onclick=async()=>{ 
+        const id=document.getElementById('edit-panel-id').value;
+        const name=document.getElementById('panel-name').value; 
+        if(!name) return showToast("Name required","error"); 
+        
+        const category = document.getElementById('panel-category').value; 
+
+        const plans={}; 
+        for(let i=0;i<plansCount;i++){ 
+            const d=document.getElementById(`plan-duration-${i}`), l=document.getElementById(`plan-label-${i}`), p=document.getElementById(`plan-price-${i}`); 
+            if(d && l && p && l.value && p.value) {
+                plans[d.value]={label:l.value, price:parseFloat(p.value)}; 
+            }
+        } 
+        if(Object.keys(plans).length === 0) return showToast("Please add at least one plan correctly!", "error");
+
+        let addedByEmail = "Master Admin"; if(currentAdmin && currentAdmin.role === 'reseller') addedByEmail = currentAdmin.email;
+        const data={ 
+            name, 
+            description:document.getElementById('panel-desc').value, 
+            category, 
+            video:document.getElementById('panel-video').value, 
+            link:document.getElementById('panel-link').value, 
+            updateLink:document.getElementById('panel-update-link').value, 
+            feedbackLink:document.getElementById('panel-feedback-link').value, 
+            status:document.getElementById('panel-status').value, 
+            plans, 
+            addedBy: addedByEmail, 
+            updatedAt:serverTimestamp() 
+        }; 
+
+        const btn = document.getElementById('save-panel-btn');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
+        try {
+            if(id){ await update(ref(db,getDbPath(`panels/${id}`)), data); showToast('Panel Updated!'); } 
+            else { await push(ref(db,getDbPath('panels')),data); showToast('Panel Added!'); } 
+            closeModal('panel-modal'); loadPanels(); loadDashboardStats(); resetPanelForm(); 
+        } catch(e) {
+            showToast("Failed to save panel: " + e.message, "error");
+        }
+
+        btn.innerHTML = ogHtml;
+        btn.disabled = false;
+    };
+    
+    document.getElementById('add-panel-btn').onclick=()=>{ resetPanelForm(); openModal('panel-modal'); };
+    
+    function resetPanelForm(){ 
+        document.getElementById('panel-modal-title').innerText='Add Panel'; 
+        document.getElementById('panel-name').value=''; 
+        document.getElementById('panel-desc').value=''; 
+        document.getElementById('panel-category').value='Root Panel';
+        document.getElementById('panel-video').value=''; 
+        document.getElementById('panel-link').value=''; 
+        document.getElementById('panel-update-link').value=''; 
+        document.getElementById('panel-feedback-link').value=''; 
+        document.getElementById('panel-status').value='active'; 
+        document.getElementById('edit-panel-id').value=''; 
+        document.getElementById('plans-container').innerHTML=''; plansCount=0; addPlanField(); 
+    }
+
+    async function loadPromotions(){ 
+        try {
+            const snap=await get(ref(db,getDbPath('promotions'))); const tbody=document.getElementById('promotions-list'); tbody.innerHTML=''; if(!snap.exists()) return; Object.entries(snap.val()).forEach(([id,p])=>{ const row=document.createElement('tr'); row.innerHTML=`<td>${p.title||'-'}</td><td>${p.image?'<img src="'+p.image+'" style="width:40px;height:30px;object-fit:cover;">':'-'}</td><td><span style="color:${p.status?'#0f0':'#f00'}">● ${p.status?'Active':'Inactive'}</span></td><td><button class="btn btn-sm" onclick="editPromo('${id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deletePromo('${id}')"><i class="fas fa-trash"></i></button></td>`; tbody.appendChild(row); }); 
+        } catch(e) {}
+    }
+    
+    window.editPromo=async(id)=>{ 
+        try {
+            const snap=await get(ref(db,getDbPath(`promotions/${id}`))); const p=snap.val(); document.getElementById('promo-modal-title').innerText='Edit Promotion'; document.getElementById('promo-title').value=p.title||''; document.getElementById('promo-image').value=p.image||''; document.getElementById('promo-link').value=p.link||''; document.getElementById('promo-status').value=p.status?'true':'false'; document.getElementById('edit-promo-id').value=id; openModal('promo-modal'); 
+        } catch(e) {}
+    };
+    
+    window.deletePromo=async(id)=>{ 
+        if(confirm('Delete?')){ 
+            try { await remove(ref(db,getDbPath(`promotions/${id}`))); showToast('Deleted!'); loadPromotions(); } catch(e){ showToast("Error", "error"); }
+        } 
+    };
+    
+    document.getElementById('save-promo-btn').onclick=async()=>{ 
+        const id=document.getElementById('edit-promo-id').value; 
+        const data={title:document.getElementById('promo-title').value,image:document.getElementById('promo-image').value,link:document.getElementById('promo-link').value,status:document.getElementById('promo-status').value==='true'}; 
+        const btn = document.getElementById('save-promo-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+        try {
+            if(id){ await update(ref(db,getDbPath(`promotions/${id}`)),data); showToast('Updated!'); } else{ await push(ref(db,getDbPath('promotions')),data); showToast('Added!'); } 
+            closeModal('promo-modal'); loadPromotions(); 
+        } catch(e) { showToast("Error", "error"); }
+        btn.innerHTML = 'Save'; btn.disabled = false;
+    };
+    
+    document.getElementById('add-promo-btn').onclick=()=>{ document.getElementById('promo-modal-title').innerText='Add Promotion'; document.getElementById('promo-title').value=''; document.getElementById('promo-image').value=''; document.getElementById('promo-link').value=''; document.getElementById('promo-status').value='true'; document.getElementById('edit-promo-id').value=''; openModal('promo-modal'); };
+    
+    async function loadCoupons() {
+        try {
+            const snap = await get(ref(db, getDbPath('coupons'))); const tbody = document.getElementById('coupons-list'); tbody.innerHTML = '';
+            if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No coupons found</td></tr>'; return; }
+            const today = new Date().toISOString().split('T')[0];
+            Object.entries(snap.val()).forEach(([code, data]) => {
+                const row = document.createElement('tr'); let status = 'Active', statusColor = '#0f0';
+                if (data.expiry && data.expiry < today) { status = 'Expired'; statusColor = '#ff2a5f'; } 
+                else if (data.used >= data.limit) { status = 'Limit Reached'; statusColor = '#ffb800'; }
+                row.innerHTML = `<td><strong>${code}</strong></td><td style="color:var(--success);"><strong>₹${data.discount}</strong></td><td>${data.limit}</td><td>${data.used || 0}</td><td><small>${data.expiry}</small></td><td><span style="color:${statusColor}; font-weight:600;">● ${status}</span></td><td><button class="btn btn-danger btn-sm" onclick="deleteCoupon('${code}')"><i class="fas fa-trash"></i> Remove</button></td>`;
+                tbody.appendChild(row);
+            });
+        } catch(e) {}
+    }
+
+    document.getElementById('add-coupon-btn').onclick = () => { document.getElementById('coupon-code').value = ''; document.getElementById('coupon-discount').value = ''; document.getElementById('coupon-limit').value = ''; document.getElementById('coupon-expiry').value = ''; openModal('coupon-modal'); };
+    
+    document.getElementById('save-coupon-btn').onclick = async () => {
+        const code = document.getElementById('coupon-code').value.trim().toUpperCase().replace(/\s+/g, ''); const discount = parseFloat(document.getElementById('coupon-discount').value); const limit = parseInt(document.getElementById('coupon-limit').value); const expiry = document.getElementById('coupon-expiry').value;
+        if (!code || isNaN(discount) || isNaN(limit) || !expiry) return showToast("Please fill all fields properly!", "error");
+        
+        const btn = document.getElementById('save-coupon-btn');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+
+        try {
+            await set(ref(db, getDbPath(`coupons/${code}`)), { discount, limit, used: 0, expiry, createdAt: serverTimestamp() }); 
+            showToast("Coupon created successfully!"); closeModal('coupon-modal'); loadCoupons(); 
+        } catch(e) {
+            showToast("Failed to create coupon", "error");
+        }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+
+    window.deleteCoupon = async (code) => { 
+        if (confirm(`Delete coupon ${code}?`)) { 
+            try { await remove(ref(db, getDbPath(`coupons/${code}`))); showToast('Coupon deleted!'); loadCoupons(); } catch(e) { showToast("Error", "error"); }
+        } 
+    };
+
+    async function loadPaymentData(){ 
+        try {
+            const snap = await get(ref(db,getDbPath('payments'))); 
+            const pendingTbody = document.getElementById('pending-payments-list'); const approvedTbody = document.getElementById('approved-payments-list'); const rejectedTbody = document.getElementById('rejected-payments-list');
+            pendingTbody.innerHTML = ''; approvedTbody.innerHTML = ''; rejectedTbody.innerHTML = '';
+            let totalPay = 0, pendingPay = 0, approvedPay = 0, rejectedPay = 0;
+            if(!snap.exists()){
+                updatePaymentStats(0,0,0,0);
+                pendingTbody.innerHTML = '<tr><td colspan="5">No pending payments</td></tr>'; approvedTbody.innerHTML = '<tr><td colspan="5">No approved payments</td></tr>'; rejectedTbody.innerHTML = '<tr><td colspan="5">No rejected payments</td></tr>';
+                return;
+            } 
+            
+            const payments = Object.entries(snap.val()).sort((a,b)=>{ const timeA = typeof a[1].timestamp === 'number' ? a[1].timestamp : (new Date(a[1].timestamp).getTime() || 0); const timeB = typeof b[1].timestamp === 'number' ? b[1].timestamp : (new Date(b[1].timestamp).getTime() || 0); return timeB - timeA; }); 
+            
+            let pendingFound = false; let approvedFound = false; let rejectedFound = false;
+
+            for(let [id, payment] of payments){ 
+                totalPay++; const row = document.createElement('tr'); 
+                if(payment.status === 'pending') {
+                    pendingPay++; pendingFound = true;
+                    row.innerHTML=`<td>${payment.email||payment.uid?.substring(0,8)}</td><td>₹${payment.amount}</td><td><small>${payment.utr||'-'}</small></td><td>${payment.phone||'-'}</td><td>
+                    <button class="btn btn-success btn-sm" onclick="approvePayment('${id}',${payment.amount},'${payment.uid}')"><i class="fas fa-check"></i> Approve</button> 
+                    <button class="btn btn-danger btn-sm" onclick="rejectPayment('${id}')"><i class="fas fa-times"></i> Reject</button></td>`; 
+                    pendingTbody.appendChild(row); 
+                } 
+                else if(payment.status === 'approved') {
+                    approvedPay++; approvedFound = true;
+                    row.innerHTML=`<td>${payment.email||payment.uid?.substring(0,8)}</td><td>₹${payment.amount}</td><td><small>${payment.utr||'-'}</small></td><td>${payment.phone||'-'}</td><td><span style="color:var(--success); font-weight:bold;">APPROVED</span></td>`; 
+                    approvedTbody.appendChild(row); 
+                }
+                else if(payment.status === 'rejected') {
+                    rejectedPay++; rejectedFound = true;
+                    row.innerHTML=`<td>${payment.email||payment.uid?.substring(0,8)}</td><td>₹${payment.amount}</td><td><small>${payment.utr||'-'}</small></td><td>${payment.phone||'-'}</td><td><span style="color:var(--error); font-weight:bold;">REJECTED</span></td>`; 
+                    rejectedTbody.appendChild(row); 
+                }
+            } 
+            
+            updatePaymentStats(totalPay, pendingPay, approvedPay, rejectedPay);
+            if(!pendingFound) pendingTbody.innerHTML = '<tr><td colspan="5">No pending payments</td></tr>';
+            if(!approvedFound) approvedTbody.innerHTML = '<tr><td colspan="5">No approved payments</td></tr>';
+            if(!rejectedFound) rejectedTbody.innerHTML = '<tr><td colspan="5">No rejected payments</td></tr>';
+        } catch(e) {}
+    }
+
+    function updatePaymentStats(tot, pen, app, rej) { document.getElementById('pm-total').innerText = tot; document.getElementById('pm-pending').innerText = pen; document.getElementById('pm-approved').innerText = app; document.getElementById('pm-rejected').innerText = rej; }
+    
+    window.approvePayment = async (id, amt, uid) => { 
+        if(confirm(`Approve ₹${amt}?`)){ 
+            try {
+                await update(ref(db,getDbPath(`payments/${id}`)),{status:'approved'}); 
+                const balRef = ref(db,getDbPath(`users/${uid}/balance`)); 
+                const snap = await get(balRef); 
+                const newBal = (parseFloat(snap.val())||0)+parseFloat(amt);
+                await set(balRef, newBal); 
+
+                // ==========================================
+                // 🚀 EMAILJS: PAYMENT APPROVED NOTIFICATION
+                // ==========================================
+                try {
+                    const userSnap = await get(ref(db, getDbPath(`users/${uid}`)));
+                    const userEmail = userSnap.val()?.email;
+                    if(userEmail) {
+                        const uName = userEmail.split('@')[0];
+                        const msg = `Dear ${uName},\n\nGreat news! Aapka ₹${amt} ka payment successfully verify ho gaya hai aur aapke wallet me add kar diya gaya hai.\n\nWallet Update:\n- Amount Added: ₹${amt}\n- Current Balance: ₹${newBal}\n\nAb aap apne wallet balance ka use karke hamari services aur keys instantly buy kar sakte hain. Hum par trust karne ke liye shukriya!\n\nBest Regards,\nRiyaz Official Store Team`;
+                        sendUserEmailAlert(userEmail, "🎉 Payment Successful! Wallet Balance Updated", msg);
+                    }
+                } catch(emailErr) { console.error("EmailJS Error: ", emailErr); }
+                // ==========================================
+
+                showToast(`₹${amt} added!`); 
+                loadPaymentData(); loadDashboardStats(); 
+            } catch (error) {
+                console.error(error);
+                showToast("Failed to approve payment", "error");
+            }
+        } 
+    };
+
+    window.rejectPayment = async (id) => { 
+        if(confirm('Reject?')){ 
+            try {
+                // Fetch details before rejecting to get email and amount
+                const paySnap = await get(ref(db, getDbPath(`payments/${id}`)));
+                const payData = paySnap.val();
+
+                await update(ref(db,getDbPath(`payments/${id}`)),{status:'rejected'}); 
+                
+                // ==========================================
+                // 🚀 EMAILJS: PAYMENT REJECTED NOTIFICATION
+                // ==========================================
+                try {
+                    if(payData && payData.email) {
+                        const uName = payData.email.split('@')[0];
+                        const amt = payData.amount || 0;
+                        const msg = `Dear ${uName},\n\nHumne aapki ₹${amt} ki payment request check ki, par unfortunately hum isey verify nahi kar paye. Isliye aapka payment request Cancel/Reject kar diya gaya hai.\n\nKyu Reject Hua?\nHo sakta hai aapne galat UTR Number dala ho, ya payment screenshot clear na ho.\n\nAage Kya Karein?\nKripya ek baar apni payment details dobara check karein aur system me ek naya request submit karein.\n\nBest Regards,\nRiyaz Official Store Team`;
+                        sendUserEmailAlert(payData.email, "⚠️ Payment Rejected: Action Required", msg);
+                    }
+                } catch(emailErr) { console.error("EmailJS Error: ", emailErr); }
+                // ==========================================
+
+                showToast('Rejected!'); loadPaymentData(); loadDashboardStats(); 
+            } catch (error) {
+                console.error(error);
+                showToast("Failed to reject payment", "error");
+            }
+        } 
+    };
+
+    // =======================================================
+    // 🚀 SUPERFAST SEARCH + UNLIMITED USERS (WITH BAN/UNBAN) 🚀
+    // =======================================================
+    let globalActiveUsers = [];
+    let globalBannedUsers = [];
+
+    async function loadUsers(){ 
+        const tbodyActive = document.getElementById('users-list');
+        const tbodyBanned = document.getElementById('banned-users-list');
+        const badgeActive = document.getElementById('user-count-badge');
+        const badgeBanned = document.getElementById('banned-count-badge');
+        
+        tbodyActive.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px;"><div class="spinner" style="margin: 0 auto 15px;"></div><p style="color:var(--neon-cyan);">Loading Database (Superfast Mode)...</p></td></tr>'; 
+        
+        try {
+            const usersSnap = await get(ref(db,getDbPath('users')));
+            globalActiveUsers = []; 
+            globalBannedUsers = [];
+            
+            if(!usersSnap.exists()) {
+                tbodyActive.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found in database.</td></tr>'; 
+                tbodyBanned.innerHTML = '<tr><td colspan="4" style="text-align:center;">No banned users found.</td></tr>';
+                badgeActive.innerText = '0 Users';
+                badgeBanned.innerText = '0';
+                return; 
+            }
+            
+            for(let [uid, user] of Object.entries(usersSnap.val())) {
+                let safeEmail = (user.email || 'No Email provided').trim();
+                let actualBalance = parseFloat(user.balance) || 0;
+                let userName = user.name || user.username || user.displayName || '-';
+                let userPhone = user.phone || user.mobile || '-';
+                let userStatus = user.status || 'active';
+
+                let userObj = {
+                    uid: uid,
+                    email: safeEmail,
+                    name: userName,
+                    phone: userPhone,
+                    balance: actualBalance,
+                    purchases: 'Auto',
+                    joined: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-',
+                    status: userStatus
+                };
+
+                if (userStatus === 'banned') {
+                    globalBannedUsers.push(userObj);
+                } else {
+                    globalActiveUsers.push(userObj);
+                }
+            }
+
+            globalActiveUsers.sort((a,b) => b.balance - a.balance);
+            globalBannedUsers.sort((a,b) => b.balance - a.balance);
+
+            badgeActive.innerText = `${globalActiveUsers.length} Users`;
+            badgeBanned.innerText = `${globalBannedUsers.length}`;
+            
+            renderActiveUsersTable(globalActiveUsers);
+            renderBannedUsersTable(globalBannedUsers);
+            
+        } catch (error) {
+            console.error(error);
+            tbodyActive.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--error);">Error loading user data!</td></tr>';
+        }
+    }
+    
+    function renderActiveUsersTable(usersArray) {
+        const tbody = document.getElementById('users-list');
+        if(usersArray.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active user found!</td></tr>';
+            return;
+        }
+        
+        let htmlContent = '';
+        usersArray.forEach(u => {
+            htmlContent += `<tr>
+                <td style="font-weight: 500;">${u.email}</td>
+                <td style="color:var(--success); font-weight:900; font-size:15px;">₹${u.balance}</td>
+                <td style="color:var(--text-muted);"><i class="fas fa-check"></i></td>
+                <td><small>${u.joined}</small></td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn btn-success btn-icon-only" onclick="addUserBalance('${u.uid}', '${u.email}')" title="Add Balance"><i class="fas fa-plus"></i></button>
+                        <button class="btn btn-danger btn-icon-only" onclick="minusUserBalance('${u.uid}', '${u.email}')" title="Deduct Balance"><i class="fas fa-minus"></i></button>
+                        <button class="btn btn-warning btn-icon-only" onclick="viewWalletHistory('${u.uid}', '${u.email}')" title="View History"><i class="fas fa-history"></i></button>
+                        <button class="btn btn-danger btn-icon-only" style="background: rgba(255,42,95,0.2); color: var(--error); border: 1px solid var(--error);" onclick="banUser('${u.uid}', '${u.email}')" title="Ban User"><i class="fas fa-user-slash"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = htmlContent;
+    }
+
+    function renderBannedUsersTable(usersArray) {
+        const tbody = document.getElementById('banned-users-list');
+        if(usersArray.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Koi bhi user banned nahi hai.</td></tr>';
+            return;
+        }
+        
+        let htmlContent = '';
+        usersArray.forEach(u => {
+            htmlContent += `<tr>
+                <td style="font-weight: 500; color: var(--error); text-decoration: line-through;">${u.email}</td>
+                <td style="color:var(--text-muted); font-weight:900; font-size:15px;">₹${u.balance}</td>
+                <td><small>${u.joined}</small></td>
+                <td>
+                    <button class="btn btn-success btn-sm" onclick="unbanUser('${u.uid}', '${u.email}')"><i class="fas fa-check-circle"></i> Unban User</button>
+                </td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = htmlContent;
+    }
+
+    // BAN / UNBAN LOGIC
+    window.banUser = async (uid, email) => {
+        if(confirm(`WARNING: Kya aap sach me "${email}" ko Ban karna chahte hain?\nBan hone ke baad ye user na app khol payega, na payment kar payega.`)) {
+            try {
+                await update(ref(db, getDbPath(`users/${uid}`)), { status: 'banned' });
+                showToast(`${email} has been BANNED!`, "error");
+                loadUsers(); 
+            } catch(e) {
+                console.error(e);
+                showToast("Failed to ban user", "error");
+            }
+        }
+    };
+
+    window.unbanUser = async (uid, email) => {
+        if(confirm(`Kya aap "${email}" ka ban hatana chahte hain?`)) {
+            try {
+                await update(ref(db, getDbPath(`users/${uid}`)), { status: 'active' });
+                showToast(`${email} UNBANNED successfully!`, "success");
+                loadUsers(); 
+            } catch(e) {
+                console.error(e);
+                showToast("Failed to unban user", "error");
+            }
+        }
+    };
+
+    // SEARCH NOW FILTERS ONLY ACTIVE USERS
+    document.getElementById('search-user-input').addEventListener('input', function(e) {
+        const searchText = e.target.value.toLowerCase().trim();
+        const quickView = document.getElementById('quick-balance-view');
+        
+        if (searchText === '') {
+            renderActiveUsersTable(globalActiveUsers); 
+            quickView.style.display = 'none';
+            return;
+        }
+
+        const filteredUsers = globalActiveUsers.filter(u => u.email.toLowerCase().includes(searchText));
+        renderActiveUsersTable(filteredUsers);
+
+        const exactMatch = filteredUsers.find(u => u.email.toLowerCase() === searchText);
+        
+        if (exactMatch) {
+            quickView.style.display = 'block'; 
+            
+            quickView.innerHTML = `
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; width: 100%;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Exact User Found</div>
+                        <div style="font-size: 18px; font-weight: bold; color: white; word-break: break-all;">${exactMatch.email}</div>
+                        <div style="font-size: 12px; color: var(--neon-cyan); margin-top: 5px;">
+                            <i class="fas fa-user"></i> ${exactMatch.name} &nbsp;&nbsp;|&nbsp;&nbsp; <i class="fas fa-phone"></i> ${exactMatch.phone}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">Current Wallet Balance</div>
+                        <div style="font-size: 28px; font-weight: 900; color: var(--success); text-shadow: 0 0 20px rgba(0,255,102,0.5);">₹${exactMatch.balance}</div>
+                    </div>
+                </div>
+                
+                <div style="width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="addUserBalance('${exactMatch.uid}', '${exactMatch.email}')" style="flex:1; justify-content:center; padding:10px;"><i class="fas fa-plus"></i> ADD ₹</button>
+                    <button class="btn btn-danger" onclick="minusUserBalance('${exactMatch.uid}', '${exactMatch.email}')" style="flex:1; justify-content:center; padding:10px;"><i class="fas fa-minus"></i> DEDUCT ₹</button>
+                </div>
+
+                <div style="width: 100%; margin-top: 20px;">
+                    <h4 style="font-size:14px; color:var(--warning); margin-bottom:10px;"><i class="fas fa-history"></i> Recent Transactions (Auto-Loaded)</h4>
+                    <div id="vip-history-container" style="max-height: 250px; overflow-y: auto; overflow-x: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.5);">
+                        <div style="text-align:center; padding:20px;"><div class="spinner" style="width:20px; height:20px; border-width:2px; margin:0 auto 10px;"></div> Fetching History...</div>
+                    </div>
+                </div>
+            `;
+            
+            fetchAndRenderHistoryInside(exactMatch.uid, exactMatch.email, 'vip-history-container');
+        } else {
+            quickView.style.display = 'none';
+        }
+    });
+
+    // Auto-fetch history function inside VIP Box
+    async function fetchAndRenderHistoryInside(uid, email, containerId) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+
+        try {
+            let historyData = [];
+
+            // 1. Fetch Manual history
+            const historySnap = await get(ref(db, getDbPath(`wallet_history/${uid}`)));
+            if (historySnap.exists()) {
+                historySnap.forEach(child => {
+                    let val = child.val();
+                    historyData.push({ amount: val.amount, type: val.type, date: val.date, by: val.by || 'Admin', details: 'Admin Update' });
+                });
+            }
+
+            // 2. Fetch User's Payments History
+            const paymentsSnap = await get(ref(db, getDbPath('payments')));
+            if (paymentsSnap.exists()) {
+                paymentsSnap.forEach(child => {
+                    let pay = child.val();
+                    if ((pay.uid === uid || (pay.email && pay.email.toLowerCase() === email.toLowerCase())) && pay.status === 'approved') {
+                        historyData.push({
+                            amount: pay.amount,
+                            type: 'add',
+                            date: pay.timestamp || pay.date || 0,
+                            by: 'User Deposit',
+                            details: `UTR: ${pay.utr || '-'}`
+                        });
+                    }
+                });
+            }
+
+            if(historyData.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:15px; font-size: 13px;">Koi transaction record nahi mila.<br><small>(Agar balance zyada hai, toh wo shayad database me manually set kiya gaya tha)</small></div>';
+                return;
+            }
+
+            // Sort Newest First
+            historyData.sort((a,b) => {
+                const timeA = typeof a.date === 'number' ? a.date : (new Date(a.date).getTime() || 0);
+                const timeB = typeof b.date === 'number' ? b.date : (new Date(b.date).getTime() || 0);
+                return timeB - timeA;
+            });
+
+            // Clean Table HTML
+            let html = '<table style="width:100%; font-size:12px; border-collapse: collapse;">';
+            html += '<tr style="background:rgba(255,255,255,0.05);"> <th style="padding:10px;">Amount</th> <th style="padding:10px;">Type</th> <th style="padding:10px;">Date & Time</th> <th style="padding:10px;">Source</th> </tr>';
+            
+            historyData.forEach(record => {
+                let dateVal = typeof record.date === 'number' ? record.date : new Date(record.date).getTime();
+                if(isNaN(dateVal) || dateVal === 0) dateVal = Date.now();
+                const dateStr = new Date(dateVal).toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+
+                const isAdd = record.type === 'add';
+                const color = isAdd ? 'var(--success)' : 'var(--error)';
+                const sign = isAdd ? '+' : '-';
+                
+                html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <td style="padding:10px; color:${color}; font-weight:bold;">${sign}₹${record.amount}</td>
+                    <td style="padding:10px; color:${color};">${isAdd ? 'Deposit' : 'Deducted'}</td>
+                    <td style="padding:10px;">${dateStr}</td>
+                    <td style="padding:10px; color:var(--neon-cyan);">${record.by} <br><span style="font-size:10px; color:gray;">${record.details || ''}</span></td>
+                </tr>`;
+            });
+            html += '</table>';
+            container.innerHTML = html;
+
+        } catch(err) {
+            container.innerHTML = '<div style="color:var(--error); padding: 15px; text-align:center;">Failed to load history</div>';
+        }
+    }
+
+    function updateLocalUserMemoryAndRefresh(uid, newBalance) {
+        const userIndex = globalActiveUsers.findIndex(u => u.uid === uid);
+        if(userIndex !== -1) {
+            globalActiveUsers[userIndex].balance = newBalance;
+            globalActiveUsers.sort((a,b) => b.balance - a.balance); 
+        }
+        document.getElementById('search-user-input').dispatchEvent(new Event('input'));
+        loadDashboardStats(); 
+    }
+
+    // ➕ ADD BALANCE LOGIC
+    window.addUserBalance = async (uid, email) => { 
+        const amt = prompt(`Enter amount to ADD for ${email}:`); 
+        if(amt && !isNaN(amt) && amt > 0) { 
+            try {
+                const balRef = ref(db, getDbPath(`users/${uid}/balance`)); 
+                const snap = await get(balRef); 
+                const newBalance = (parseFloat(snap.val()) || 0) + parseFloat(amt);
+                
+                await set(balRef, newBalance); 
+                
+                await push(ref(db, getDbPath(`wallet_history/${uid}`)), {
+                    amount: parseFloat(amt),
+                    type: 'add',
+                    date: serverTimestamp(),
+                    by: currentAdmin ? currentAdmin.email : 'Admin'
+                });
+
+                showToast(`₹${amt} added successfully!`); 
+                updateLocalUserMemoryAndRefresh(uid, newBalance);
+            } catch(e) {
+                showToast("Failed to add balance", "error");
+            }
+        } 
+    };
+
+    // ➖ DEDUCT BALANCE LOGIC
+    window.minusUserBalance = async (uid, email) => { 
+        const amt = prompt(`Enter amount to DEDUCT (Minus) from ${email}:`); 
+        if(amt && !isNaN(amt) && amt > 0) { 
+            try {
+                const balRef = ref(db, getDbPath(`users/${uid}/balance`)); 
+                const snap = await get(balRef); 
+                
+                let currentBal = parseFloat(snap.val()) || 0;
+                let newBalance = currentBal - parseFloat(amt);
+                if(newBalance < 0) newBalance = 0; 
+                
+                await set(balRef, newBalance); 
+                
+                await push(ref(db, getDbPath(`wallet_history/${uid}`)), {
+                    amount: parseFloat(amt),
+                    type: 'deduct',
+                    date: serverTimestamp(),
+                    by: currentAdmin ? currentAdmin.email : 'Admin'
+                });
+
+                showToast(`₹${amt} deducted successfully!`); 
+                updateLocalUserMemoryAndRefresh(uid, newBalance);
+            } catch(e) {
+                showToast("Failed to deduct balance", "error");
+            }
+        } 
+    };
+
+    // 🕒 VIEW WALLET HISTORY BUTTON LOGIC (MODAL)
+    window.viewWalletHistory = async (uid, email) => {
+        document.getElementById('history-modal-title').innerText = `History: ${email}`;
+        const tbody = document.getElementById('wallet-history-list');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;"><div class="spinner" style="width:30px; height:30px; margin:0 auto 10px;"></div>Fetching full records...</td></tr>';
+        openModal('wallet-history-modal');
+
+        let historyData = [];
+
+        try {
+            // 1. Fetch Manual Admin history
+            const historySnap = await get(ref(db, getDbPath(`wallet_history/${uid}`)));
+            if (historySnap.exists()) {
+                historySnap.forEach(child => {
+                    let val = child.val();
+                    historyData.push({ amount: val.amount, type: val.type, date: val.date, by: val.by || 'Admin', details: 'Manual Update' });
+                });
+            }
+
+            // 2. Fetch User's Old Approved Payments
+            const paymentsSnap = await get(ref(db, getDbPath('payments')));
+            if (paymentsSnap.exists()) {
+                paymentsSnap.forEach(child => {
+                    let pay = child.val();
+                    if ((pay.uid === uid || (pay.email && pay.email.toLowerCase() === email.toLowerCase())) && pay.status === 'approved') {
+                        historyData.push({
+                            amount: pay.amount,
+                            type: 'add',
+                            date: pay.timestamp || pay.date || 0,
+                            by: 'User Deposit',
+                            details: `UTR: ${pay.utr || '-'}`
+                        });
+                    }
+                });
+            }
+
+            if(historyData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--warning); padding:15px;">Koi record nahi mila.<br><small style="color:var(--text-muted);">Agar inka balance zyada hai, toh wo shayad database se direct update hua tha jiska log nahi hota.</small></td></tr>';
+                return;
+            }
+
+            // Sort Newest First
+            historyData.sort((a,b) => {
+                const timeA = typeof a.date === 'number' ? a.date : (new Date(a.date).getTime() || 0);
+                const timeB = typeof b.date === 'number' ? b.date : (new Date(b.date).getTime() || 0);
+                return timeB - timeA;
+            });
+
+            tbody.innerHTML = '';
+            historyData.forEach(record => {
+                let dateVal = typeof record.date === 'number' ? record.date : new Date(record.date).getTime();
+                if(isNaN(dateVal) || dateVal === 0) dateVal = Date.now();
+                
+                const dateStr = new Date(dateVal).toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+
+                const isAdd = record.type === 'add';
+                const color = isAdd ? 'var(--success)' : 'var(--error)';
+                const sign = isAdd ? '+' : '-';
+                const icon = isAdd ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+                const typeLabel = isAdd ? (record.by.includes('Deposit') ? 'Deposit' : 'Added') : 'Deducted';
+
+                tbody.innerHTML += `
+                    <tr style="background: rgba(0,0,0,0.3);">
+                        <td style="color:${color}; font-weight:bold; font-size:15px;">${icon} ${sign}₹${record.amount}</td>
+                        <td style="color:${color};">${typeLabel}</td>
+                        <td><small>${dateStr}</small></td>
+                        <td><small style="color:var(--neon-cyan);">${record.by}</small><br><span style="font-size:10px; color:gray;">${record.details||''}</span></td>
+                    </tr>
+                `;
+            });
+
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--error);">Failed to load history.</td></tr>';
+        }
+    };
+
+    async function loadSettings(){ 
+        try {
+            const ps=await get(ref(db,getDbPath('settings/payment'))); 
+            if(ps.exists()){ document.getElementById('setting-upi').value=ps.val().upiId||''; document.getElementById('setting-qr').value=ps.val().qrImage||''; } 
+            else { document.getElementById('setting-upi').value=''; document.getElementById('setting-qr').value=''; }
+            
+            const ss=await get(ref(db,getDbPath('support_links'))); 
+            if(ss.exists()){ 
+                document.getElementById('setting-wa').value=ss.val().whatsapp||''; 
+                document.getElementById('setting-tg-login').value=ss.val().telegram_login||''; 
+                document.getElementById('setting-tg-dash').value=ss.val().telegram_dashboard||''; 
+                document.getElementById('setting-customer-support').value=ss.val().customer_support||''; 
+                document.getElementById('setting-tg-floating').value=ss.val().telegram_floating||''; 
+            } else {
+                document.getElementById('setting-wa').value=''; 
+                document.getElementById('setting-tg-login').value=''; 
+                document.getElementById('setting-tg-dash').value=''; 
+                document.getElementById('setting-customer-support').value=''; 
+                document.getElementById('setting-tg-floating').value=''; 
+            }
+            
+            const ds = await get(ref(db, getDbPath('settings/design')));
+            if(ds.exists()) {
+                if(ds.val().backgroundImage) document.getElementById('setting-bg-image').value = ds.val().backgroundImage;
+                if(ds.val().loginImage) document.getElementById('setting-login-image').value = ds.val().loginImage;
+                if(ds.val().authBoxBg) document.getElementById('setting-auth-box-bg').value = ds.val().authBoxBg;
+                if(ds.val().authHeading) document.getElementById('setting-auth-heading').value = ds.val().authHeading;
+                if(ds.val().authSubheading) document.getElementById('setting-auth-subheading').value = ds.val().authSubheading;
+            } else {
+                document.getElementById('setting-bg-image').value = '';
+                document.getElementById('setting-login-image').value = '';
+                document.getElementById('setting-auth-box-bg').value = '';
+                document.getElementById('setting-auth-heading').value = '';
+                document.getElementById('setting-auth-subheading').value = '';
+            }
+
+            const ac = await get(ref(db, getDbPath('settings/app_controls')));
+            if(ac.exists()){
+                const data = ac.val();
+                document.getElementById('setting-maint-status').value = data.maintenance || 'false';
+                document.getElementById('setting-maint-msg').value = data.maintenance_msg || '';
+                document.getElementById('setting-maint-img').value = data.maintenance_img || ''; 
+                document.getElementById('setting-maint-link').value = data.maintenance_link || ''; 
+                document.getElementById('setting-ticker-status').value = data.ticker || 'false';
+                document.getElementById('setting-ticker-msg').value = data.ticker_msg || '';
+                document.getElementById('setting-popup-status').value = data.popup || 'false';
+                document.getElementById('setting-popup-img').value = data.popup_img || '';
+                document.getElementById('setting-popup-link').value = data.popup_link || '';
+                document.getElementById('setting-popup-text').value = data.popup_text || '';
+            } else {
+                document.getElementById('setting-maint-status').value = 'false';
+                document.getElementById('setting-ticker-status').value = 'false';
+                document.getElementById('setting-popup-status').value = 'false';
+            }
+            
+            // LOAD BANNED SCREEN SETTINGS
+            const bs = await get(ref(db, getDbPath('settings/banned_screen')));
+            if(bs.exists()){
+                document.getElementById('setting-banned-img').value = bs.val().image || '';
+                document.getElementById('setting-banned-link').value = bs.val().link || '';
+            } else {
+                document.getElementById('setting-banned-img').value = '';
+                document.getElementById('setting-banned-link').value = '';
+            }
+        } catch(e) {
+            console.error("Load settings error:", e);
+        }
+    }
+    
+    document.getElementById('save-payment-settings').onclick=async()=>{ 
+        const btn = document.getElementById('save-payment-settings');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+        try {
+            await set(ref(db,getDbPath('settings/payment')),{upiId:document.getElementById('setting-upi').value,qrImage:document.getElementById('setting-qr').value}); 
+            showToast('Saved!'); 
+        } catch(e) { showToast("Error saving", "error"); }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+    
+    document.getElementById('save-support-links').onclick=async()=>{ 
+        const btn = document.getElementById('save-support-links');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+        try {
+            await set(ref(db,getDbPath('support_links')),{ 
+                whatsapp:document.getElementById('setting-wa').value, 
+                telegram_login:document.getElementById('setting-tg-login').value, 
+                telegram_dashboard:document.getElementById('setting-tg-dash').value, 
+                customer_support:document.getElementById('setting-customer-support').value, 
+                telegram_floating:document.getElementById('setting-tg-floating').value
+            }); 
+            showToast('Saved!'); 
+        } catch(e) { showToast("Error saving", "error"); }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+    
+    document.getElementById('save-design-settings').onclick=async()=>{ 
+        const btn = document.getElementById('save-design-settings');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+        try {
+            await set(ref(db, getDbPath('settings/design')), { backgroundImage: document.getElementById('setting-bg-image').value.trim(), loginImage: document.getElementById('setting-login-image').value.trim(), authBoxBg: document.getElementById('setting-auth-box-bg').value.trim(), authHeading: document.getElementById('setting-auth-heading').value.trim(), authSubheading: document.getElementById('setting-auth-subheading').value.trim() }); 
+            showToast('Design Settings Saved!'); 
+        } catch(e) { showToast("Error saving", "error"); }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+
+    document.getElementById('save-app-controls').onclick = async () => {
+        const btn = document.getElementById('save-app-controls');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+        try {
+            await set(ref(db, getDbPath('settings/app_controls')), { maintenance: document.getElementById('setting-maint-status').value, maintenance_msg: document.getElementById('setting-maint-msg').value, maintenance_img: document.getElementById('setting-maint-img').value, maintenance_link: document.getElementById('setting-maint-link').value, ticker: document.getElementById('setting-ticker-status').value, ticker_msg: document.getElementById('setting-ticker-msg').value, popup: document.getElementById('setting-popup-status').value, popup_img: document.getElementById('setting-popup-img').value, popup_link: document.getElementById('setting-popup-link').value, popup_text: document.getElementById('setting-popup-text').value });
+            
+            await set(ref(db, getDbPath('settings/banned_screen')), {
+                image: document.getElementById('setting-banned-img').value.trim(),
+                link: document.getElementById('setting-banned-link').value.trim()
+            });
+            showToast('App Controls Saved Successfully!');
+        } catch(e) { showToast("Error saving", "error"); }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+
+    // ==========================================
+    // 🚀 RESELLER MANAGEMENT (MASTER ONLY) 🚀
+    // ==========================================
+    async function loadResellers() {
+        try {
+            const snap = await get(ref(db, 'resellers'));
+            const tbody = document.getElementById('resellers-list');
+            tbody.innerHTML = '';
+            if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No resellers found</td></tr>'; return; }
+            
+            let currentUrlPath = window.location.href.split('?')[0];
+            let pathParts = currentUrlPath.split('/');
+            pathParts[pathParts.length - 1] = 'index.html'; 
+            const domainURL = pathParts.join('/');
+            
+            Object.entries(snap.val()).forEach(([id, r]) => {
+                const row = document.createElement('tr');
+                const isBanned = r.status === 'banned';
+                
+                let validityText = 'Unlimited';
+                let isExpired = false;
+                if (r.validityEnd) {
+                    const endDate = new Date(r.validityEnd);
+                    validityText = endDate.toLocaleDateString();
+                    if (Date.now() > r.validityEnd) {
+                        validityText = `<span style="color:var(--error); font-weight:bold;">Expired (${validityText})</span>`;
+                        isExpired = true;
+                    }
+                }
+
+                const storeLink = `${domainURL}?store=${id}`;
+
+                row.innerHTML = `
+                    <td><strong>${r.email}</strong></td>
+                    <td><span style="font-family:monospace; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px;">${r.password}</span></td>
+                    <td><span style="color:${isBanned ? 'var(--error)' : 'var(--success)'}; font-weight:600;">● ${isBanned ? 'Banned' : 'Active'}</span></td>
+                    <td>${validityText}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${storeLink}'); showToast('Reseller link copied!')" style="font-size:10px;"><i class="fas fa-copy"></i> Copy Link</button>
+                    </td>
+                    <td>
+                        <button class="btn ${isBanned ? 'btn-success' : 'btn-warning'} btn-sm" onclick="toggleResellerStatus('${id}', '${r.status}')"><i class="fas ${isBanned ? 'fa-check' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteReseller('${id}')"><i class="fas fa-trash"></i></button>
+                    </td>`;
+                tbody.appendChild(row);
+            });
+        } catch(e) {}
+    }
+
+    document.getElementById('add-reseller-btn').onclick = () => { 
+        document.getElementById('reseller-email').value = ''; 
+        document.getElementById('reseller-pass').value = ''; 
+        document.getElementById('reseller-validity').value = '30';
+        openModal('reseller-modal'); 
+    };
+
+    document.getElementById('save-reseller-btn').onclick = async () => {
+        const email = document.getElementById('reseller-email').value.trim();
+        const pass = document.getElementById('reseller-pass').value.trim();
+        const validityDays = parseInt(document.getElementById('reseller-validity').value.trim()) || 30;
+
+        if (!email || !pass) return showToast("Enter email and password", "error");
+        
+        const btn = document.getElementById('save-reseller-btn');
+        const ogHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+
+        try {
+            const validityEnd = Date.now() + (validityDays * 24 * 60 * 60 * 1000);
+            await push(ref(db, 'resellers'), { 
+                email: email, 
+                password: pass, 
+                status: 'active', 
+                validityEnd: validityEnd,
+                createdAt: serverTimestamp() 
+            });
+            showToast("Reseller account created successfully!"); 
+            closeModal('reseller-modal'); 
+            loadResellers();
+        } catch(e) {
+            showToast("Failed to create reseller", "error");
+        }
+        btn.innerHTML = ogHtml; btn.disabled = false;
+    };
+
+    window.toggleResellerStatus = async (id, currentStatus) => { 
+        try {
+            const newStatus = currentStatus === 'banned' ? 'active' : 'banned'; 
+            await update(ref(db, `resellers/${id}`), { status: newStatus }); 
+            showToast(`Reseller is now ${newStatus}!`, newStatus === 'banned' ? 'error' : 'success'); 
+            loadResellers(); 
+        } catch(e) { showToast("Error updating status", "error"); }
+    };
+    
+    window.deleteReseller = async (id) => { 
+        if (confirm("Are you sure you want to delete this Reseller? (Sari details Delete ho jayegi)")) { 
+            try {
+                await remove(ref(db, `resellers/${id}`)); 
+                await remove(ref(db, `stores/${id}`)); // Deleting their entire store data
+                showToast("Reseller & their Store deleted!"); 
+                loadResellers(); 
+            } catch(e) { showToast("Error deleting reseller", "error"); }
+        } 
+    };
+
+</script>
+</body>
+</html>
