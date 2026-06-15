@@ -858,6 +858,11 @@
     let plansCount = 0; 
     const adminEmails = ["mp4990453@gmail.com", "your-email@gmail.com"];
     
+// ==========================================
+// 🚀 HARDCODED SUPER ADMIN CREDENTIALS
+// ==========================================
+    const SUPER_ADMIN_EMAIL = "tushilesh@gmail.com";
+    const SUPER_ADMIN_PASSWORD = "Tushilesh@26";
     window.copyToClipboard = (text) => {
         const tempInput = document.createElement('input');
         document.body.appendChild(tempInput);
@@ -898,20 +903,19 @@
         
         const resellerEmail = localStorage.getItem('reseller_logged_in_email');
         const resellerId = localStorage.getItem('reseller_logged_in_id');
-
+        const superAdminLoggedIn = localStorage.getItem('super_admin_logged_in');
         // 🔥 URL FIX APPLIED HERE 🔥
         const domainURL = 'https://work81259-maker.github.io/protected-project/';
 
-        if (firebaseUser && adminEmails.includes(firebaseUser.email)) {
-            currentAdmin = firebaseUser; 
-            currentStoreId = 'master'; 
-            document.getElementById('admin-email-display').innerHTML = `<i class="fas fa-crown" style="color:var(--warning);"></i> ${firebaseUser.email}`; 
-            resellerMenu.style.display = 'flex'; 
-            
-            document.getElementById('my-store-link').value = `${domainURL}?store=master`;
-            
-            showApp(as, aa, l);
-        } 
+        if (superAdminLoggedIn === 'true') {
+    currentAdmin = { email: SUPER_ADMIN_EMAIL, role: 'super_admin' };
+    currentStoreId = 'master'; 
+    document.getElementById('admin-email-display').innerHTML = `<i class="fas fa-crown" style="color:var(--warning);"></i> ${SUPER_ADMIN_EMAIL} (SUPER ADMIN)`; 
+    resellerMenu.style.display = 'flex'; 
+    document.getElementById('my-store-link').value = `${domainURL}?store=master`;
+    showApp(as, aa, l);
+}
+else if (firebaseUser && adminEmails.includes(firebaseUser.email)) {
         else if (resellerEmail && resellerId) {
             currentAdmin = { email: resellerEmail, role: 'reseller', id: resellerId };
             currentStoreId = resellerId; 
@@ -937,7 +941,15 @@
         const loginBtn = document.getElementById('admin-login-btn');
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
         loginBtn.disabled = true;
-
+        // 🚀 CHECK HARDCODED SUPER ADMIN FIRST 🚀
+if (e === SUPER_ADMIN_EMAIL && p === SUPER_ADMIN_PASSWORD) {
+    localStorage.setItem('super_admin_logged_in', 'true');
+    showToast("Super Admin Login Successful!"); 
+    checkLoginState(null);
+    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
+    loginBtn.disabled = false;
+    return;
+}
         if (adminEmails.includes(e)) {
             try { 
                 await signInWithEmailAndPassword(auth, e, p); 
@@ -995,16 +1007,13 @@
         loginBtn.disabled = false;
     };
 
-    document.getElementById('admin-logout-btn').onclick = async () => { 
-        if (localStorage.getItem('reseller_logged_in_email')) { 
-            localStorage.removeItem('reseller_logged_in_email'); 
-            localStorage.removeItem('reseller_logged_in_id'); 
-            checkLoginState(null); 
-            showToast("Reseller Logged Out");
-        } else {
-            await signOut(auth); 
-        }
-    };
+document.getElementById('admin-logout-btn').onclick = async () => { 
+    localStorage.removeItem('reseller_logged_in_email'); 
+    localStorage.removeItem('reseller_logged_in_id');
+    localStorage.removeItem('super_admin_logged_in');
+    await signOut(auth);
+    location.reload();
+};
 
     const getDbPath = (path) => {
         if (currentStoreId === 'master') return path; 
